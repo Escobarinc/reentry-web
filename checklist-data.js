@@ -41,6 +41,9 @@ window.REENTRY_CHECKLIST = [
     body: [
       { id: 'fi-rozpocet', t: 'Rozpočet na 12 měsíců', d: '2 210 000 Kč.', soubor: 'Rozpocet_12_mesicu_Reentry.pdf', stav: 'hotovo' },
       { id: 'fi-pitch', t: 'Pitch pro dárce (2 strany)', soubor: 'Pitch_pro_darce_REENTRY.pdf', stav: 'hotovo' },
+      { id: 'fi-projekt', t: 'Podrobný projekt pro dárce (8 stran)', soubor: 'REENTRY_Projekt_pro_darce.pdf', stav: 'hotovo' },
+      { id: 'fi-vykaz', t: 'Výkaz práce zakladatelů (hodiny a co se dělalo)', d: 'Doloží odhad 1 500 hodin / 1,5 mil. Kč. Zpětně sestavit z dat souborů a zpráv, dál vést měsíčně. Hodí se pro granty jako vlastní vklad.', stav: 'nezacato' },
+      { id: 'fi-naklady', t: 'Sepsat a doložit vlastní výdaje do přípravy (faktury, účtenky)', stav: 'nezacato' },
       { id: 'fi-ucet', t: 'Založit transparentní účet', d: 'Banka chce: výpis z rejstříku, stanovy, zápis o volbě výboru, evidenci skutečných majitelů, doklady předsedy.', stav: 'nezacato' },
       { id: 'fi-ucet-doplnit', t: 'Číslo účtu doplnit do pitche, na web, do darovací smlouvy', stav: 'nezacato' },
       { id: 'fi-ucetni', t: 'Domluvit účetní / účetní software', stav: 'nezacato' },
