@@ -105,7 +105,8 @@ window.REENTRY_CHECKLIST = [
     body: [
       { id: 'sy-demo', t: 'Ukázková verze CRM propojená s webem', d: 'Zatím bez hesla, data jen v prohlížeči. Nezadávat skutečné klienty.', stav: 'hotovo' },
       { id: 'sy-checklist', t: 'Tento checklist na webu', stav: 'hotovo' },
-      { id: 'sy-firebase', t: 'Založit projekt Firebase (sdílené poznámky a databáze)', d: 'Návod: NASTAVENI_FIREBASE.md ve složce webu.', stav: 'nezacato' },
+      { id: 'sy-firebase', t: 'Checklist sdílený přes Firebase', d: 'Dočasně v projektu milan-workspace. Do poznámek nepsat osobní údaje klientů.', stav: 'hotovo' },
+      { id: 'sy-firebase-presun', t: 'Přestěhovat checklist do vlastního Firebase projektu REENTRY', d: 'Možné od 28. 12. 2026 (limit projektů u Googlu). Připomenutí je nastavené.', stav: 'nezacato' },
       { id: 'sy-db', t: 'CRM: databáze v cloudu (EU) místo prohlížeče', stav: 'nezacato' },
       { id: 'sy-login', t: 'CRM: přihlášení pro tým', stav: 'nezacato' },
       { id: 'sy-auto', t: 'CRM: úkoly klienta + automatická kontrola plnění', stav: 'nezacato' },
