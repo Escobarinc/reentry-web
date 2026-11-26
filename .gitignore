@@ -1,0 +1,9 @@
+# Nikdy nezveřejňovat: osobní údaje, interní plány, originály
+DOKUMENTY/
+NOVE GEN/
+MASTERPLAN.md
+img/ilustrace-z-navrhu/
+firestore.rules
+.firebaserc
+.claude/
+.DS_Store

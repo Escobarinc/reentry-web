@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist – REENTRY</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="img/logo/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0d2b55; --blue:#1f63b6; --sky:#eaf3fc; --sky2:#d9e9f8; --yellow:#f6b80b; --ink:#1c2b3d; --muted:#5b6c80; --line:#dbe6f1; --ok:#1f9d55; --okbg:#e6f6ec; --wip:#b57400; --wipbg:#fff4d6; --chk:#7a3db8; --chkbg:#f1e8fb; --bg:#f5f9fe; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Figtree', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.5; }
+  a { color: var(--blue); }
+  button, input, select, textarea { font: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  header { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+  .bar { display: flex; align-items: center; gap: 16px; height: 68px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand img { width: 40px; height: 40px; }
+  .brand b { font: 900 21px/1 'Archivo'; color: var(--navy); display: block; }
+  .brand small { font-size: 11.5px; color: var(--muted); }
+  .bar nav { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .bar nav a, .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; color: var(--navy); border: 1px solid var(--line); background: #fff; cursor: pointer; }
+  .bar nav a.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .btn-y { background: var(--yellow); border-color: var(--yellow); color: var(--navy); }
+  .btn:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+
+  .hero { padding: 28px 0 8px; }
+  h1 { font: 900 clamp(28px, 4vw, 38px)/1.05 'Archivo'; color: var(--navy); letter-spacing: -.02em; }
+  .hero p { color: var(--muted); margin-top: 6px; max-width: 720px; }
+  .sync { margin-top: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; padding: 10px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--line); }
+  .sync .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--wip); flex-shrink: 0; }
+  .sync.live .dot { background: var(--ok); }
+  .sync .who { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  .summary { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 12px; margin: 18px 0; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .card .n { font: 800 26px/1 'Archivo'; color: var(--navy); }
+  .card .l { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  .progress { height: 10px; background: var(--sky); border-radius: 6px; overflow: hidden; margin-top: 10px; }
+  .progress i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--yellow)); border-radius: 6px; transition: width .4s; }
+
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .chip { padding: 7px 12px; border-radius: 20px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--ink); }
+  .chip.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .tools input[type=search] { margin-left: auto; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); min-width: 220px; background: #fff; }
+
+  .sec { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin-bottom: 14px; overflow: hidden; }
+  .sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 14px 18px; }
+  .sec > summary::-webkit-details-marker { display: none; }
+  .sec h2 { font: 800 18px/1.2 'Archivo'; color: var(--navy); }
+  .sec .ico { font-size: 20px; }
+  .sec .cnt { margin-left: auto; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .sec .mini { width: 90px; height: 6px; background: var(--sky); border-radius: 4px; overflow: hidden; }
+  .sec .mini i { display: block; height: 100%; background: var(--blue); }
+  .sec .chev { transition: transform .2s; color: var(--muted); }
+  .sec[open] .chev { transform: rotate(90deg); }
+
+  .item { border-top: 1px solid var(--line); padding: 12px 18px; display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: start; }
+  .item.hotovo .tt { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
+  .tick { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--line); background: #fff; cursor: pointer; display: grid; place-items: center; margin-top: 1px; }
+  .tick svg { width: 16px; height: 16px; opacity: 0; color: #fff; }
+  .item.hotovo .tick { background: var(--ok); border-color: var(--ok); }
+  .item.hotovo .tick svg { opacity: 1; }
+  .tt { font-weight: 600; color: var(--navy); }
+  .dd { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+  .file { display: inline-block; font-size: 12px; color: var(--blue); background: var(--sky); border-radius: 6px; padding: 1px 7px; margin-top: 5px; }
+  .meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .meta select, .meta input[type=date] { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: 13px; color: var(--ink); }
+  .st { font-weight: 700; }
+  .st[data-v=hotovo] { background: var(--okbg); color: var(--ok); border-color: #bfe6cd; }
+  .st[data-v=rozpracovano] { background: var(--wipbg); color: var(--wip); border-color: #f3d27a; }
+  .st[data-v=overit] { background: var(--chkbg); color: var(--chk); border-color: #dcc6f3; }
+  .nbtn { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--navy); white-space: nowrap; }
+  .nbtn b { background: var(--yellow); color: var(--navy); border-radius: 10px; padding: 0 6px; margin-left: 4px; font-size: 12px; }
+  .notes { grid-column: 2 / -1; display: none; background: var(--bg); border-radius: 12px; padding: 12px; margin-top: 4px; }
+  .notes.open { display: block; }
+  .note { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 14px; }
+  .note .h { font-size: 12px; color: var(--muted); margin-bottom: 2px; display: flex; gap: 8px; }
+  .note .h b { color: var(--navy); }
+  .note .h button { margin-left: auto; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 12px; }
+  .addnote { display: flex; gap: 8px; }
+  .addnote textarea { flex: 1; min-height: 42px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; resize: vertical; background: #fff; }
+  .addrow { border-top: 1px dashed var(--line); padding: 10px 18px; display: flex; gap: 8px; }
+  .addrow input { flex: 1; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+  .custom-tag { font-size: 11px; color: var(--chk); background: var(--chkbg); border-radius: 6px; padding: 0 6px; margin-left: 6px; font-weight: 600; }
+  .empty { padding: 30px; text-align: center; color: var(--muted); }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 26px 0 40px; }
+
+  dialog { border: 0; border-radius: 16px; padding: 22px; max-width: 380px; width: calc(100% - 32px); box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+  dialog::backdrop { background: rgba(13,43,85,.4); }
+  dialog h3 { font: 800 20px 'Archivo'; color: var(--navy); margin-bottom: 6px; }
+  dialog p { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+  dialog .opts { display: grid; gap: 8px; }
+
+  @media (max-width: 760px) {
+    .summary { grid-template-columns: 1fr 1fr; }
+    .summary .card:first-child { grid-column: 1 / -1; }
+    .item { grid-template-columns: 30px 1fr; }
+    .meta { grid-column: 2; justify-content: flex-start; }
+    .notes { grid-column: 1 / -1; }
+    .tools input[type=search] { margin-left: 0; width: 100%; }
+    .bar nav a span { display: none; }
+    .brand small { display: none; }
+    .sec .mini { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="index.html"><img src="img/logo/reentry-znak.svg" alt=""><span><b>REENTRY</b><small>Checklist týmu</small></span></a>
+    <nav>
+      <a href="index.html">← <span>Web</span></a>
+      <a href="reentry-crm.html"><span>CRM</span><span aria-hidden="true" style="display:inline">🖥️</span></a>
+      <a class="on" href="checklist.html">Checklist</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Co nás čeká do spuštění ve Vinařicích</h1>
+    <p>Všechno na jednom místě: úřady, razítka, dokumenty, komu napsat, partneři i samotné spuštění. U každého bodu nastavte stav, kdo ho má na starosti a termín. Do poznámek pište, co se děje, ať to vidí i ostatní.</p>
+    <div class="sync" id="sync"><span class="dot"></span><span id="syncText">Načítám…</span><span class="who" id="who"></span></div>
+  </section>
+
+  <section class="summary" id="summary"></section>
+
+  <div class="tools" role="toolbar" aria-label="Filtry">
+    <button class="chip on" data-f="vse">Vše</button>
+    <button class="chip" data-f="zbyva">Zbývá</button>
+    <button class="chip" data-f="rozpracovano">Rozpracováno</button>
+    <button class="chip" data-f="overit">Ověřit</button>
+    <button class="chip" data-f="hotovo">Hotovo</button>
+    <button class="chip" data-f="moje">Moje</button>
+    <input type="search" id="q" placeholder="Hledat bod…" aria-label="Hledat">
+  </div>
+
+  <div id="list"></div>
+</main>
+
+<footer>REENTRY – Institut podmíněného propuštění, z. s. · interní checklist týmu</footer>
+
+<dialog id="whoDlg">
+  <h3>Kdo jsi?</h3>
+  <p>Podle toho se podepisují tvoje poznámky a funguje filtr „Moje“.</p>
+  <div class="opts">
+    <button class="btn" data-me="MZ">Milan Zedníček</button>
+    <button class="btn" data-me="RP">Radomil Petřík</button>
+    <button class="btn" data-me="ET">Evžen Tříska</button>
+  </div>
+</dialog>
+
+<script src="checklist-data.js"></script>
+<script type="module">
+  import { FIREBASE_CONFIG } from './firebase-config.js';
+
+  const PEOPLE = { MZ: 'Milan Zedníček', RP: 'Radomil Petřík', ET: 'Evžen Tříska' };
+  const STATES = [['nezacato','Nezačato'],['rozpracovano','Rozpracováno'],['overit','Ověřit'],['hotovo','Hotovo']];
+  const SECTIONS = window.REENTRY_CHECKLIST;
+  const LS_KEY = 'reentry_checklist_v1', LS_ME = 'reentry_checklist_me';
+
+  let state = {};   // itemId -> { stav, kdo, termin, poznamky: [] }
+  let extras = [];  // custom items { id, sekce, t, d }
+  let filter = 'vse', query = '';
+  let me = null; try { me = localStorage.getItem(LS_ME); } catch (e) {}
+  let backend = null; // { save(id, data), addExtra(item), removeExtra(id) }
+  const openNotes = new Set();
+
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const fmt = ts => { try { return new Date(ts).toLocaleString('cs-CZ', { day:'numeric', month:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' }); } catch (e) { return ''; } };
+
+  function allItems() {
+    const out = [];
+    SECTIONS.forEach(s => {
+      s.body.forEach(b => out.push({ ...b, sekce: s.id }));
+      extras.filter(x => x.sekce === s.id).forEach(x => out.push({ ...x, custom: true, stav: 'nezacato' }));
+    });
+    return out;
+  }
+  const cur = it => ({ stav: it.stav, kdo: '', termin: '', poznamky: [], ...(state[it.id] || {}) });
+
+  function matches(it) {
+    const c = cur(it);
+    if (filter === 'zbyva' && c.stav === 'hotovo') return false;
+    if (['rozpracovano','overit','hotovo'].includes(filter) && c.stav !== filter) return false;
+    if (filter === 'moje' && (!me || c.kdo !== me)) return false;
+    if (query) {
+      const hay = (it.t + ' ' + (it.d || '') + ' ' + (it.soubor || '') + ' ' + c.poznamky.map(p => p.text).join(' ')).toLowerCase();
+      if (!hay.includes(query)) return false;
+    }
+    return true;
+  }
+
+  function render() {
+    const items = allItems();
+    const done = items.filter(i => cur(i).stav === 'hotovo').length;
+    const wip = items.filter(i => cur(i).stav === 'rozpracovano').length;
+    const chk = items.filter(i => cur(i).stav === 'overit').length;
+    const left = items.length - done;
+    const pct = items.length ? Math.round(done / items.length * 100) : 0;
+    $('#summary').innerHTML = `
+      <div class="card"><div class="n">${pct} %</div><div class="l">hotovo z ${items.length} bodů</div><div class="progress"><i style="width:${pct}%"></i></div></div>
+      <div class="card"><div class="n">${done}</div><div class="l">hotovo</div></div>
+      <div class="card"><div class="n">${left}</div><div class="l">zbývá</div></div>
+      <div class="card"><div class="n">${wip}</div><div class="l">rozpracováno</div></div>
+      <div class="card"><div class="n">${chk}</div><div class="l">ověřit</div></div>`;
+
+    const openSecs = new Set([...document.querySelectorAll('.sec[open]')].map(d => d.dataset.id));
+    const firstRender = !document.querySelector('.sec');
+    let html = '';
+    SECTIONS.forEach((s, si) => {
+      const all = items.filter(i => i.sekce === s.id);
+      const vis = all.filter(matches);
+      const sd = all.filter(i => cur(i).stav === 'hotovo').length;
+      if (!vis.length && (filter !== 'vse' || query)) return;
+      const isOpen = firstRender ? all.some(i => cur(i).stav !== 'hotovo') : (openSecs.has(s.id) || filter !== 'vse' || query);
+      html += `<details class="sec" data-id="${s.id}" ${isOpen ? 'open' : ''}>
+        <summary><span class="ico">${s.ikona}</span><h2>${esc(s.nazev)}</h2><span class="cnt">${sd} / ${all.length}</span><span class="mini"><i style="width:${all.length ? sd/all.length*100 : 0}%"></i></span><span class="chev">›</span></summary>
+        ${vis.map(itemHtml).join('')}
+        <form class="addrow" data-sec="${s.id}"><input name="t" placeholder="Přidat vlastní bod do „${esc(s.nazev)}“…" aria-label="Nový bod"><button class="btn" type="submit">Přidat</button></form>
+      </details>`;
+    });
+    $('#list').innerHTML = html || '<div class="empty">Nic neodpovídá filtru.</div>';
+  }
+
+  function itemHtml(it) {
+    const c = cur(it);
+    const n = c.poznamky.length;
+    return `<div class="item ${c.stav}" data-id="${it.id}">
+      <button class="tick" data-act="tick" aria-label="Označit jako hotovo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></button>
+      <div>
+        <div class="tt">${esc(it.t)}${it.custom ? '<span class="custom-tag">přidáno</span>' : ''}</div>
+        ${it.d ? `<div class="dd">${esc(it.d)}</div>` : ''}
+        ${it.soubor ? `<span class="file" title="Soubor ve složce DOKUMENTY v počítači">📄 ${esc(it.soubor)}</span>` : ''}
+      </div>
+      <div class="meta">
+        <select class="st" data-act="stav" data-v="${c.stav}" aria-label="Stav">${STATES.map(([v,l]) => `<option value="${v}" ${v===c.stav?'selected':''}>${l}</option>`).join('')}</select>
+        <select data-act="kdo" aria-label="Kdo">${['', 'MZ', 'RP', 'ET'].map(v => `<option value="${v}" ${v===c.kdo?'selected':''}>${v ? v : 'Kdo?'}</option>`).join('')}</select>
+        <input type="date" data-act="termin" value="${esc(c.termin)}" aria-label="Termín">
+        <button class="nbtn" data-act="notes">Poznámky${n ? `<b>${n}</b>` : ''}</button>
+      </div>
+      <div class="notes ${openNotes.has(it.id) ? 'open' : ''}">
+        ${c.poznamky.map((p, i) => `<div class="note"><div class="h"><b>${esc(PEOPLE[p.autor] || p.autor || '?')}</b><span>${fmt(p.cas)}</span><button data-act="delnote" data-i="${i}">smazat</button></div>${esc(p.text).replace(/\n/g,'<br>')}</div>`).join('') || '<div class="dd" style="margin-bottom:8px">Zatím žádné poznámky.</div>'}
+        <div class="addnote"><textarea placeholder="Napiš poznámku: co se stalo, s kým jsi mluvil, co dál…" aria-label="Nová poznámka"></textarea><button class="btn btn-y" data-act="addnote">Uložit</button></div>
+        ${it.custom ? '<div style="margin-top:8px"><button class="nbtn" data-act="delitem">Smazat tento přidaný bod</button></div>' : ''}
+      </div>
+    </div>`;
+  }
+
+  function update(id, patch) {
+    const it = allItems().find(i => i.id === id);
+    const next = { ...cur(it), ...patch };
+    state[id] = next;
+    render();
+    backend.save(id, { stav: next.stav, kdo: next.kdo, termin: next.termin, poznamky: next.poznamky });
+  }
+
+  document.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (chip) { document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === chip)); filter = chip.dataset.f; if (filter === 'moje' && !me) $('#whoDlg').showModal(); render(); return; }
+    const meBtn = e.target.closest('[data-me]');
+    if (meBtn) { me = meBtn.dataset.me; try { localStorage.setItem(LS_ME, me); } catch (er) {} $('#whoDlg').close(); renderWho(); render(); return; }
+    if (e.target.closest('#changeMe')) { $('#whoDlg').showModal(); return; }
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    const row = a.closest('.item'); const id = row?.dataset.id; if (!id) return;
+    const c = cur(allItems().find(i => i.id === id));
+    if (a.dataset.act === 'tick') update(id, { stav: c.stav === 'hotovo' ? 'nezacato' : 'hotovo' });
+    if (a.dataset.act === 'notes') { openNotes.has(id) ? openNotes.delete(id) : openNotes.add(id); render(); }
+    if (a.dataset.act === 'addnote') {
+      const ta = row.querySelector('textarea'); const text = ta.value.trim(); if (!text) return;
+      if (!me) { $('#whoDlg').showModal(); return; }
+      openNotes.add(id);
+      update(id, { poznamky: [...c.poznamky, { text, autor: me, cas: Date.now() }] });
+    }
+    if (a.dataset.act === 'delnote') { if (!confirm('Smazat poznámku?')) return; const p = [...c.poznamky]; p.splice(+a.dataset.i, 1); update(id, { poznamky: p }); }
+    if (a.dataset.act === 'delitem') { if (!confirm('Smazat přidaný bod i s poznámkami?')) return; extras = extras.filter(x => x.id !== id); delete state[id]; render(); backend.removeExtra(id); }
+  });
+  document.addEventListener('change', e => {
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    const id = a.closest('.item')?.dataset.id; if (!id) return;
+    if (a.dataset.act === 'stav') update(id, { stav: a.value });
+    if (a.dataset.act === 'kdo') update(id, { kdo: a.value });
+    if (a.dataset.act === 'termin') update(id, { termin: a.value });
+  });
+  document.addEventListener('submit', e => {
+    const f = e.target.closest('.addrow'); if (!f) return; e.preventDefault();
+    const t = f.t.value.trim(); if (!t) return;
+    const item = { id: 'x-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), sekce: f.dataset.sec, t, d: '' };
+    extras.push(item); render(); backend.addExtra(item);
+  });
+  $('#q').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); render(); });
+
+  function renderWho(user) {
+    const name = me ? PEOPLE[me] : null;
+    $('#who').innerHTML = `${user !== undefined ? user : ''}${name ? `<span>Jsi: <b>${esc(name)}</b></span> <button class="btn" id="changeMe">Změnit</button>` : `<button class="btn" id="changeMe">Kdo jsem?</button>`}`;
+  }
+  function setSync(live, text) { $('#sync').classList.toggle('live', live); $('#syncText').innerHTML = text; }
+
+  // ---------- Úložiště v prohlížeči (dokud není Firebase) ----------
+  function localBackend() {
+    try { const raw = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); state = raw.state || {}; extras = raw.extras || []; } catch (e) {}
+    const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ state, extras })); } catch (e) {} };
+    setSync(false, '<b>Zatím se ukládá jen v tomto prohlížeči.</b> Sdílení s kolegy se zapne po napojení Firebase.');
+    return { save: persist, addExtra: persist, removeExtra: persist };
+  }
+
+  // ---------- Firebase (sdílené pro celý tým) ----------
+  async function firebaseBackend() {
+    const v = '10.12.2';
+    const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`);
+    const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } = await import(`https://www.gstatic.com/firebasejs/${v}/firebase-auth.js`);
+    const { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } = await import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`);
+    const app = initializeApp(FIREBASE_CONFIG);
+    const auth = getAuth(app), db = getFirestore(app);
+    let unsub = [];
+    const api = {
+      save: (id, data) => setDoc(doc(db, 'checklist', id), { ...data, upraveno: Date.now(), upravil: me || '' }).catch(err),
+      addExtra: item => setDoc(doc(db, 'checklist_extra', item.id), item).catch(err),
+      removeExtra: id => Promise.all([deleteDoc(doc(db, 'checklist_extra', id)), deleteDoc(doc(db, 'checklist', id))]).catch(err),
+    };
+    function err(e) { console.error(e); setSync(false, `<b>Uložení se nepovedlo.</b> ${e.code === 'permission-denied' ? 'Tento účet nemá přístup. Požádej Milana o přidání.' : esc(e.message)}`); }
+    onAuthStateChanged(auth, user => {
+      unsub.forEach(u => u()); unsub = [];
+      if (!user) {
+        setSync(false, 'Pro sdílený checklist se přihlas Google účtem.');
+        renderWho('<button class="btn btn-y" id="login">Přihlásit Google</button>');
+        $('#login').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(err);
+        render(); return;
+      }
+      setSync(true, `<b>Sdílené s týmem.</b> Změny se ukládají hned a ostatní je vidí.`);
+      renderWho(`<span>${esc(user.email)}</span> <button class="btn" id="logout">Odhlásit</button> `);
+      $('#logout').onclick = () => signOut(auth);
+      unsub.push(onSnapshot(collection(db, 'checklist'), snap => { const s = {}; snap.forEach(d => { s[d.id] = d.data(); }); state = s; render(); }, err));
+      unsub.push(onSnapshot(collection(db, 'checklist_extra'), snap => { extras = snap.docs.map(d => d.data()); render(); }, err));
+    });
+    return api;
+  }
+
+  const configured = FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && !String(FIREBASE_CONFIG.apiKey).startsWith('DOPLNIT');
+  backend = configured ? await firebaseBackend().catch(e => { console.error(e); return localBackend(); }) : localBackend();
+  renderWho();
+  render();
+</script>
+</body>
+</html>

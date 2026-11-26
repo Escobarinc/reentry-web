@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REENTRY – Institut podmíněného propuštění, z. s.</title>
+<meta name="description" content="REENTRY je tvůj parťák pro přípravu na podmíněné propuštění. Audit připravenosti, konkrétní plán a podpora u soudu. Zapsaný spolek, Praha.">
+<meta property="og:title" content="REENTRY – Chceš jít domů?">
+<meta property="og:description" content="Nejsme charita. Nejsme tví advokáti. Jsme REENTRY – tvůj parťák pro přípravu na podmíněné propuštění.">
+<meta property="og:image" content="img/hero-ilustrace.jpg">
+<link rel="icon" href="img/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="img/logo/ikona-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="img/logo/ikona-180.png">
+<meta name="theme-color" content="#0d2b55">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d2b55;
+    --navy-2: #12386d;
+    --blue: #1f63b6;
+    --blue-dark: #174f93;
+    --sky: #eaf3fc;
+    --sky-2: #d9e9f8;
+    --yellow: #f6b80b;
+    --yellow-dark: #e0a500;
+    --ink: #1c2b3d;
+    --muted: #4f6278;
+    --line: #d6e3f1;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 10px 30px rgba(13, 43, 85, .08);
+    --wrap: 1180px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+  body { font-family: 'Figtree', system-ui, sans-serif; color: var(--ink); background: var(--white); line-height: 1.6; font-size: 17px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 28px; }
+  h1, h2, h3 { font-family: 'Archivo', sans-serif; color: var(--navy); line-height: 1.05; letter-spacing: -0.02em; }
+  .eyebrow { font: 700 13px/1 'Figtree', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: inline-flex; align-items: center; gap: 10px; }
+  .eyebrow::before { content: ''; width: 28px; height: 4px; border-radius: 2px; background: var(--yellow); }
+  .h2 { font-size: clamp(32px, 4.4vw, 50px); font-weight: 900; margin-bottom: 18px; }
+  .lead { color: var(--muted); font-size: 18px; max-width: 620px; }
+  section { padding: 96px 0; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 15px 26px; border-radius: 12px; font: 700 16px/1 'Figtree', sans-serif; text-decoration: none; border: 2px solid transparent; transition: transform .15s ease, background .15s ease, box-shadow .15s ease; cursor: pointer; }
+  .btn svg { width: 18px; height: 18px; transition: transform .15s ease; }
+  .btn:hover svg { transform: translateX(3px); }
+  .btn:focus-visible, .nav a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .btn-blue { background: var(--blue); color: #fff; box-shadow: 0 8px 20px rgba(31, 99, 182, .25); }
+  .btn-blue:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .btn-outline { background: #fff; color: var(--blue); border-color: var(--blue); }
+  .btn-outline:hover { background: var(--sky); }
+  .btn-yellow { background: var(--yellow); color: var(--navy); box-shadow: 0 8px 20px rgba(246, 184, 11, .3); }
+  .btn-yellow:hover { background: var(--yellow-dark); transform: translateY(-1px); }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border-bottom: 1px solid transparent; transition: border-color .2s, box-shadow .2s; }
+  header.scrolled { border-color: var(--line); box-shadow: 0 4px 18px rgba(13,43,85,.06); }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 80px; gap: 24px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand .r { width: 46px; height: 46px; border-radius: 8px; background: var(--navy); color: #fff; font: 900 30px/1 'Archivo', sans-serif; display: grid; place-items: center; box-shadow: inset 0 0 0 3px var(--yellow); flex-shrink: 0; }
+  .logo-mark { width: 48px; height: 48px; flex-shrink: 0; }
+  .brand b { display: block; font: 900 27px/1 'Archivo', sans-serif; color: var(--navy); letter-spacing: -.01em; }
+  .brand small { display: block; font-size: 12.5px; color: var(--ink); margin-top: 3px; white-space: nowrap; }
+  .nav { display: flex; align-items: center; gap: 34px; list-style: none; }
+  .nav a { text-decoration: none; font-weight: 500; font-size: 16px; color: var(--ink); position: relative; padding: 6px 0; }
+  .nav a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 2px; background: var(--yellow); transform: scaleX(0); transition: transform .2s; }
+  .nav a:hover::after { transform: scaleX(1); }
+  .nav .team-link a { color: var(--muted); font-size: 14px; }
+  .nav .team-first { border-left: 1px solid var(--line); padding-left: 22px; margin-left: -6px; }
+  .menu-btn { display: none; background: none; border: 0; width: 44px; height: 44px; cursor: pointer; color: var(--navy); }
+  .menu-btn svg { width: 28px; height: 28px; }
+
+  /* Hero */
+  .hero { position: relative; padding: 0; background: linear-gradient(180deg, #f6faff 0%, #fff 100%); overflow: hidden; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: center; min-height: 540px; }
+  .hero-copy { position: relative; z-index: 2; padding: 64px 0 72px; }
+  .hero h1 { font-size: clamp(50px, 6.3vw, 86px); font-weight: 900; line-height: .95; letter-spacing: -0.035em; margin-bottom: 26px; }
+  .hero h1 .y { color: var(--yellow); }
+  .hero p { font-size: clamp(18px, 1.6vw, 21px); color: var(--ink); max-width: 500px; margin-bottom: 34px; line-height: 1.5; }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-art { position: relative; align-self: stretch; margin-right: calc((100vw - min(100vw, var(--wrap))) / -2 - 28px); }
+  .hero-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 42% center;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.35) 12%, #000 32%); mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.35) 12%, #000 32%); }
+
+  .hero-art .slide { opacity: 0; transition: opacity 1.4s ease; }
+  .hero-art .slide.on { opacity: 1; }
+  .dots { position: absolute; right: 28px; bottom: 22px; display: flex; gap: 8px; z-index: 3; }
+  .dots button { width: 10px; height: 10px; border-radius: 50%; border: 0; padding: 0; background: rgba(255,255,255,.65); box-shadow: 0 0 0 1px rgba(13,43,85,.25); cursor: pointer; transition: width .3s, background .3s; }
+  .dots button.on { width: 28px; border-radius: 5px; background: var(--yellow); }
+
+  /* Institut + steps */
+  .institut { background: var(--sky); padding: 84px 0 96px; }
+  .inst-head { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: end; margin-bottom: 44px; }
+  .inst-head .h2 { margin: 0; }
+  .inst-head p { color: var(--muted); font-size: 17.5px; }
+  .steps { background: #fff; border-radius: 18px; box-shadow: var(--shadow); padding: 34px 34px 38px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+  .step-img, .quote-wrap > img, .who-img, .card-img { height: auto; }
+  .step-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 12px; margin-bottom: 20px; background: var(--sky); }
+  .step-top { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .num { width: 40px; height: 40px; border-radius: 50%; background: var(--sky-2); color: var(--navy); font: 800 18px/1 'Archivo', sans-serif; display: grid; place-items: center; flex-shrink: 0; }
+  .step-line { flex: 1; height: 2px; background: var(--line); position: relative; }
+  .step-line::after { content: ''; position: absolute; right: -2px; top: -5px; width: 10px; height: 10px; border-top: 2px solid var(--blue); border-right: 2px solid var(--blue); transform: rotate(45deg); }
+  .step:last-child .step-line::after { display: none; }
+  .step-body { display: grid; grid-template-columns: 76px 1fr; gap: 18px; align-items: start; }
+  .step-ico { width: 76px; height: 76px; border-radius: 50%; background: var(--sky); display: grid; place-items: center; position: relative; }
+  .step-ico::after { content: ''; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: var(--yellow); right: 2px; bottom: 4px; z-index: 0; }
+  .step-ico svg { width: 38px; height: 38px; position: relative; z-index: 1; color: var(--navy); }
+  .step h3 { font-size: 27px; font-weight: 900; letter-spacing: .01em; margin-bottom: 8px; }
+  .step p { color: var(--muted); font-size: 16px; }
+  .step .more { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; color: var(--blue); font-weight: 700; text-decoration: none; font-size: 15.5px; }
+  .step .more svg { width: 16px; height: 16px; color: var(--yellow-dark); }
+
+  /* O nás / quote */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .about p + p { margin-top: 16px; }
+  .about p { color: var(--muted); }
+  .quote { position: relative; background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 60%, var(--blue-dark) 100%); color: #fff; border-radius: 22px; padding: 56px 48px; overflow: hidden; }
+  .quote::before { content: 'R'; position: absolute; right: -20px; bottom: -70px; font: 900 300px/1 'Archivo', sans-serif; color: rgba(255,255,255,.05); }
+  .quote blockquote { font: 800 clamp(32px, 3.6vw, 46px)/1.1 'Archivo', sans-serif; letter-spacing: -0.02em; position: relative; }
+  .quote .underline { width: 140px; height: 6px; border-radius: 3px; background: var(--yellow); margin: 26px 0 16px; transform: rotate(-2deg); }
+  .quote cite { font-style: normal; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.65); }
+  .pillars { display: grid; gap: 12px; margin-top: 28px; }
+  .pillar { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 12px; background: var(--sky); }
+  .pillar svg { width: 24px; height: 24px; flex-shrink: 0; color: var(--blue); margin-top: 2px; }
+  .pillar b { display: block; color: var(--navy); }
+  .pillar span { font-size: 15.5px; color: var(--muted); }
+
+  .quote-wrap { position: relative; }
+  .quote-wrap > img { width: 100%; aspect-ratio: 4 / 3.3; object-fit: cover; border-radius: 22px; box-shadow: var(--shadow); }
+  .quote-wrap .quote { margin: -110px 28px 0; padding: 36px 34px; box-shadow: 0 20px 40px rgba(13,43,85,.25); }
+  .quote-wrap .quote blockquote { font-size: clamp(26px, 2.6vw, 34px); }
+
+  /* Pro koho */
+  .who { background: linear-gradient(180deg, var(--sky) 0%, #f5f9fe 100%); }
+  .who-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 64px; align-items: start; }
+  .who-list { display: grid; gap: 14px; }
+  .who-item { display: flex; gap: 16px; align-items: flex-start; background: #fff; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
+  .check { width: 34px; height: 34px; border-radius: 50%; background: var(--yellow); display: grid; place-items: center; flex-shrink: 0; }
+  .check svg { width: 18px; height: 18px; color: var(--navy); }
+  .who-item b { display: block; color: var(--navy); font-size: 17.5px; margin-bottom: 2px; }
+  .who-item span { color: var(--muted); font-size: 15.5px; }
+  .who-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px; margin-top: 28px; box-shadow: var(--shadow); }
+  .criteria { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .criteria h3 { font-size: 18px; margin-bottom: 12px; }
+  .criteria ul { list-style: none; display: grid; gap: 8px; }
+  .criteria li { padding-left: 26px; position: relative; color: var(--muted); font-size: 16px; }
+  .criteria li::before { content: ''; position: absolute; left: 4px; top: 9px; width: 9px; height: 9px; border-radius: 50%; background: var(--blue); }
+
+  /* Jak začít */
+  .start-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 40px; }
+  .card { border: 1px solid var(--line); border-radius: 18px; padding: 30px; background: #fff; }
+  .card-img { width: calc(100% + 60px); margin: -30px -30px 22px; aspect-ratio: 16 / 8; object-fit: cover; border-radius: 18px 18px 0 0; }
+  .card { overflow: hidden; }
+  .card h3 { font-size: 22px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .card h3 svg { width: 28px; height: 28px; color: var(--blue); }
+  .card ul { list-style: none; display: grid; gap: 10px; }
+  .card li { padding-left: 24px; position: relative; color: var(--muted); }
+  .card li::before { content: ''; position: absolute; left: 0; top: 10px; width: 12px; height: 3px; border-radius: 2px; background: var(--yellow); }
+  .card address { font-style: normal; margin-top: 16px; padding: 14px 16px; background: var(--sky); border-radius: 10px; color: var(--navy); font-weight: 600; }
+
+  /* Tým */
+  .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
+  .member { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 28px; display: flex; gap: 20px; align-items: flex-start; box-shadow: var(--shadow); }
+  .avatar { width: 84px; height: 84px; border-radius: 16px; background: linear-gradient(150deg, var(--navy), var(--blue)); color: #fff; font: 900 30px/1 'Archivo', sans-serif; display: grid; place-items: center; flex-shrink: 0; box-shadow: inset 0 -5px 0 var(--yellow); }
+  .member h3 { font-size: 21px; margin-bottom: 4px; }
+  .member .role { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+  .member p { font-size: 15.5px; color: var(--muted); }
+
+  /* Kontakt */
+  .contact { background: linear-gradient(140deg, rgba(13,43,85,.95) 0%, rgba(15,51,102,.9) 55%, rgba(18,56,109,.93) 100%), url(img/chodba.jpg) center / cover; color: #fff; position: relative; overflow: hidden; }
+  .contact::before { content: ''; position: absolute; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, rgba(246,184,11,.16), transparent 65%); left: -160px; top: -160px; }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; position: relative; }
+  .contact .eyebrow { color: #a9c8ee; }
+  .contact .h2 { color: #fff; }
+  .contact .lead { color: rgba(255,255,255,.78); }
+  .c-items { list-style: none; display: grid; gap: 16px; margin-top: 30px; }
+  .c-items li { display: flex; gap: 14px; align-items: center; }
+  .c-items .ic { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,.1); display: grid; place-items: center; flex-shrink: 0; }
+  .c-items svg { width: 20px; height: 20px; color: var(--yellow); }
+  .c-items small { display: block; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+  .c-items a, .c-items span { color: #fff; text-decoration: none; font-weight: 600; font-size: 17px; }
+  .c-items a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  form { background: #fff; color: var(--ink); border-radius: 20px; padding: 32px; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { margin-bottom: 14px; }
+  label { display: block; font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+  input, select, textarea { width: 100%; font: 400 16px 'Figtree', sans-serif; color: var(--ink); padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: #fbfdff; transition: border-color .15s; }
+  input:focus, select:focus, textarea:focus { border-color: var(--blue); outline: none; }
+  textarea { min-height: 120px; resize: vertical; }
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--muted); margin: 4px 0 18px; }
+  .consent input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+  .consent a { color: var(--blue); }
+  form .btn { width: 100%; justify-content: center; }
+  .hp { position: absolute; left: -9999px; }
+  .form-ok { display: none; text-align: center; padding: 30px 10px; }
+  .form-ok h3 { font-size: 26px; margin-bottom: 8px; }
+
+  /* Footer */
+  footer { background: #fff; padding: 48px 0 28px; border-top: 1px solid var(--line); }
+  .foot { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+  .foot-nav { display: flex; gap: 26px; list-style: none; flex-wrap: wrap; }
+  .foot-nav a { text-decoration: none; color: var(--ink); font-weight: 500; }
+  .foot-nav a:hover { color: var(--blue); }
+  .legal { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+  .legal a { color: var(--muted); }
+
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
+
+  /* Responsive */
+  @media (max-width: 1020px) {
+    .nav { gap: 22px; }
+    .bar .btn-yellow { display: none; }
+    .steps { grid-template-columns: 1fr; gap: 26px; }
+    .step-line::after { display: none; }
+    .team-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    body { font-size: 16px; }
+    section { padding: 68px 0; }
+    .wrap { padding: 0 20px; }
+    .menu-btn { display: grid; place-items: center; }
+    .nav { position: fixed; inset: 80px 0 auto 0; background: #fff; flex-direction: column; align-items: stretch; gap: 0; padding: 8px 20px 20px; border-bottom: 1px solid var(--line); box-shadow: 0 16px 30px rgba(13,43,85,.1); transform: translateY(-8px); opacity: 0; pointer-events: none; transition: .2s; }
+    .nav.open { transform: none; opacity: 1; pointer-events: auto; }
+    .nav a { display: block; padding: 14px 4px; border-bottom: 1px solid var(--line); }
+    .nav a::after { display: none; }
+    .nav .team-first { border-left: 0; padding-left: 0; margin-left: 0; }
+    .brand small { font-size: 11px; }
+    .hero-grid { grid-template-columns: 1fr; min-height: 0; }
+    .hero-copy { padding: 40px 0 28px; }
+    .hero-art { margin: 0 -20px; height: 280px; }
+    .hero-art img { -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%); mask-image: linear-gradient(180deg, transparent 0%, #000 18%); object-position: 40% center; }
+    .inst-head, .about-grid, .who-grid, .contact-grid, .start-grid { grid-template-columns: 1fr; gap: 32px; }
+    .steps { padding: 26px 22px; }
+    .step-body { grid-template-columns: 60px 1fr; }
+    .step-ico { width: 60px; height: 60px; }
+    .step-ico svg { width: 30px; height: 30px; }
+    .quote { padding: 40px 28px; }
+    .quote-wrap .quote { margin: -60px 14px 0; padding: 28px 24px; }
+    .card-img { width: calc(100% + 60px); }
+    .dots { right: 20px; bottom: 14px; }
+    .row { grid-template-columns: 1fr; gap: 0; }
+    form { padding: 24px; }
+    .member { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="REENTRY – úvod">
+      <img class="logo-mark" src="img/logo/reentry-znak.svg" alt="" width="48" height="48">
+      <span><b>REENTRY</b><small>Institut podmíněného propuštění</small></span>
+    </a>
+    <nav aria-label="Hlavní menu">
+      <ul class="nav" id="nav">
+        <li><a href="#o-nas">O nás</a></li>
+        <li><a href="#jak-fungujeme">Jak fungujeme</a></li>
+        <li><a href="#pro-koho">Pro koho</a></li>
+        <li><a href="#tym">Tým</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+        <li class="team-link team-first"><a href="checklist.html">Checklist</a></li>
+        <li class="team-link"><a href="reentry-crm.html">CRM</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-yellow" href="#kontakt">Kontaktuj nás <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Otevřít menu" aria-expanded="false" aria-controls="nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1>CHCEŠ<br><span class="y">JÍT</span> DOMŮ?</h1>
+      <p>Nejsme charita. Nejsme tví advokáti.<br>Jsme REENTRY – tvůj parťák pro přípravu na podmíněné propuštění.</p>
+      <div class="hero-actions">
+        <a class="btn btn-blue" href="#jak-fungujeme">Jak fungujeme <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-outline" href="#kontakt">Kontaktuj nás</a>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <img class="slide on" src="img/hero-ilustrace.jpg" alt="" width="1012" height="553" fetchpriority="high">
+      <img class="slide" src="img/navrat-domu.jpg" alt="" width="1400" height="788" loading="lazy">
+      <img class="slide" src="img/rozhovor-audit.jpg" alt="" width="1400" height="788" loading="lazy">
+      <img class="slide" src="img/mentor-knihovna.jpg" alt="" width="1400" height="788" loading="lazy">
+      <img class="slide" src="img/dilna-prace.jpg" alt="" width="1400" height="788" loading="lazy">
+      <div class="dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTITUT + KROKY -->
+<section class="institut" id="jak-fungujeme">
+  <div class="wrap">
+    <div class="inst-head reveal">
+      <div>
+        <div class="eyebrow">Jak fungujeme</div>
+        <h2 class="h2">Institut podmíněného propuštění</h2>
+      </div>
+      <p>Pomáháme lidem ve výkonu trestu připravit se na podmíněné propuštění a úspěšný návrat do společnosti. Dáváme odbornou podporu, strukturovaný plán a praktické nástroje, které zvyšují šanci na nový začátek.</p>
+    </div>
+
+    <div class="steps reveal">
+      <article class="step">
+        <img class="step-img" src="img/rozhovor-audit.jpg" alt="Konzultantka mluví s klientem u stolu" loading="lazy" width="1400" height="788">
+        <div class="step-top"><span class="num">1</span><span class="step-line"></span></div>
+        <div class="step-body">
+          <div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3l5 5h-5z"/><path d="M8 9h3M8 13h5M8 17h2"/><circle cx="16.5" cy="16.5" r="3"/><path d="M18.7 18.7L21 21"/></svg></div>
+          <div>
+            <h3>AUDIT</h3>
+            <p>Narovinu ti řekneme, jak na tom jsi a co musíš změnit. Společně projdeme bydlení, práci, dluhy, vztahy i rizika.</p>
+          </div>
+        </div>
+      </article>
+      <article class="step">
+        <img class="step-img" src="img/dilna-prace.jpg" alt="Mistr v dílně ukazuje mladému muži práci se dřevem" loading="lazy" width="1400" height="788">
+        <div class="step-top"><span class="num">2</span><span class="step-line"></span></div>
+        <div class="step-body">
+          <div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 10l1.5 1.5 3-3M8.5 16l1.5 1.5 3-3"/><path d="M15 11h1M15 17h1"/></svg></div>
+          <div>
+            <h3>PLÁN</h3>
+            <p>Dostaneš jasné úkoly a reálný plán, který má u soudu váhu. Když je splníš, jedeme dál.</p>
+          </div>
+        </div>
+      </article>
+      <article class="step">
+        <img class="step-img" src="img/navrat-domu.jpg" alt="Muž odchází z brány věznice a vítá ho blízká osoba" loading="lazy" width="1400" height="788">
+        <div class="step-top"><span class="num">3</span><span class="step-line"></span></div>
+        <div class="step-body">
+          <div class="step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10"/><path d="M5 7h14"/><path d="M5 7l-3 6a3 3 0 0 0 6 0z"/><path d="M19 7l-3 6a3 3 0 0 0 6 0z"/></svg></div>
+          <div>
+            <h3>SOUD</h3>
+            <p>Připravíme tě na jednání o podmíněném propuštění a podpoříme tvou žádost výstupní zprávou pro soud.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- O NÁS -->
+<section class="about" id="o-nas">
+  <div class="wrap about-grid">
+    <div class="reveal">
+      <div class="eyebrow">O nás</div>
+      <h2 class="h2">Proč jsme vznikli</h2>
+      <p>Podmíněné propuštění je šance vrátit se domů dřív. Soud ale chce vidět, že jsi na život venku opravdu připravený: kde budeš bydlet, z čeho budeš žít, jak vyřešíš dluhy.</p>
+      <p>Právě tahle příprava bývá nejslabším místem. Věznice nemají kapacitu věnovat se každému zvlášť, a tak spousta lidí přichází k soudu bez plánu. REENTRY to mění: individuálně, systematicky a s důrazem na skutečnou připravenost, ne na papír.</p>
+      <div class="pillars">
+        <div class="pillar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.5a3.2 3.2 0 0 1 0 6.3M18 14.3c1.8.8 3 2.6 3 4.7"/></svg><div><b>Peer mentoring</b><span>Vedou tě lidé, kteří výkonem trestu sami prošli.</span></div></div>
+        <div class="pillar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><div><b>Audit připravenosti</b><span>Strukturované hodnocení tvých šancí na podmíněné propuštění.</span></div></div>
+        <div class="pillar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/></svg><div><b>Příprava k soudu</b><span>Reálný plán, podklady a nácvik jednání.</span></div></div>
+      </div>
+    </div>
+    <div class="quote-wrap reveal">
+      <img src="img/mentor-knihovna.jpg" alt="Mentorka doporučuje knihu muži ve vězeňské knihovně" loading="lazy" width="1400" height="788">
+      <div class="quote">
+        <blockquote>„Podmínka je šance. Nezahoď ji. Je to na tobě.“</blockquote>
+        <div class="underline"></div>
+        <cite>Motto spolku REENTRY</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRO KOHO -->
+<section class="who" id="pro-koho">
+  <div class="wrap who-grid">
+    <div class="reveal">
+      <div class="eyebrow">Pro koho</div>
+      <h2 class="h2">Pro koho jsme tu</h2>
+      <p class="lead">Pomáháme lidem ve výkonu trestu, kteří chtějí pracovat na své budoucnosti, a jejich blízkým.</p>
+      <img class="who-img" src="img/dvur-praha.jpg" alt="Vězeňský dvůr, za zdí je vidět Praha" loading="lazy" width="1400" height="788">
+      <div class="criteria">
+        <h3>Co od tebe čekáme</h3>
+        <ul>
+          <li>Opravdový zájem poctivě se připravit na podmíněné propuštění</li>
+          <li>Věk nad 18 let</li>
+          <li>Ochotu spolupracovat a říkat pravdu</li>
+        </ul>
+      </div>
+    </div>
+    <div class="who-list reveal">
+      <div class="who-item"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>Pro osoby ve výkonu trestu</b><span>Které zvažují nebo plánují podat žádost o podmíněné propuštění a chtějí se na ni důkladně připravit.</span></div></div>
+      <div class="who-item"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>Pro rodiny a blízké</b><span>Které chtějí pomoct: poradit se, zjistit možnosti nebo zajistit potřebné dokumenty.</span></div></div>
+      <div class="who-item"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>Před nástupem trestu</b><span>Pro ty, kdo vědí, že nastoupí, a chtějí se od začátku správně připravit na podmíněné propuštění.</span></div></div>
+      <div class="who-item"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>Pro odborníky a organizace</b><span>Sociální pracovníky, vychovatele, advokáty a partnery, kteří se na přípravě podílejí.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- JAK ZAČÍT -->
+<section class="start">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Jak začít</div>
+      <h2 class="h2">Jak se k nám dostaneš</h2>
+    </div>
+    <div class="start-grid">
+      <div class="card reveal">
+        <img class="card-img" src="img/dopis.jpg" alt="Ruce vkládají dopis do obálky" loading="lazy" width="1400" height="788">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Jsi ve výkonu trestu</h3>
+        <ul>
+          <li>Napiš nám dopis. Ozveme se ti a domluvíme další postup.</li>
+          <li>Kontakt ti může předat sociální pracovnice nebo vychovatel.</li>
+          <li>Možná jsi našel náš leták na nástěnce na oddíle.</li>
+        </ul>
+        <address>REENTRY – Institut podmíněného propuštění, z. s.<br>Děčínská 552/1, 180 00 Praha 8</address>
+      </div>
+      <div class="card reveal">
+        <img class="card-img" src="img/navsteva-rodiny.jpg" alt="Návštěva rodiny ve věznici, otec mluví se synem a partnerkou" loading="lazy" width="1400" height="788">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Jsi z rodiny</h3>
+        <ul>
+          <li>Zavolej nám nebo pošli SMS.</li>
+          <li>Pošli e-mail nebo vyplň formulář níže.</li>
+          <li>Po domluvě se můžeme sejít osobně v Praze.</li>
+        </ul>
+        <address>+420 606 589 032 · info@reentry.cz</address>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TÝM -->
+<section class="team" id="tym" style="background:#f5f9fe">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Náš tým</div>
+      <h2 class="h2">Zakládající členové</h2>
+    </div>
+    <div class="team-grid">
+      <div class="member reveal">
+        <div class="avatar">MZ</div>
+        <div><h3>Milan Zedníček</h3><div class="role">Zakladatel · Ředitel programu</div><p>Vede klientský program REENTRY. Výkon trestu zná z vlastní zkušenosti, a proto ví, co člověk potřebuje, aby svoboda vydržela.</p></div>
+      </div>
+      <div class="member reveal">
+        <div class="avatar">RP</div>
+        <div><h3>Radomil Petřík</h3><div class="role">Předseda spolku</div><p>Zastupuje spolek navenek a odpovídá za jeho vedení a finance.</p></div>
+      </div>
+      <div class="member reveal">
+        <div class="avatar">ET</div>
+        <div><h3>Evžen Tříska</h3><div class="role">Místopředseda</div><p>Spolutvůrce metodiky práce s klienty, věnuje se přímé práci v terénu.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KONTAKT -->
+<section class="contact" id="kontakt">
+  <div class="wrap contact-grid">
+    <div class="reveal">
+      <div class="eyebrow">Kontakt</div>
+      <h2 class="h2">Spojte se s námi</h2>
+      <p class="lead">Máš otázku? Chceš vědět, jak ti můžeme pomoct? Ozvi se. Jsme tu pro tebe, tvoje blízké i pro odborníky.</p>
+      <ul class="c-items">
+        <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span><div><small>Telefon</small><a href="tel:+420606589032">+420 606 589 032</a></div></li>
+        <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><div><small>E-mail</small><a href="mailto:info@reentry.cz">info@reentry.cz</a></div></li>
+        <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span><div><small>Adresa pro dopisy</small><span>Děčínská 552/1, 180 00 Praha 8</span></div></li>
+      </ul>
+    </div>
+
+    <form class="reveal" id="form" name="kontakt" method="POST" data-netlify="true" netlify-honeypot="web" action="#kontakt">
+      <div class="form-fields">
+        <input type="hidden" name="form-name" value="kontakt">
+        <p class="hp"><label>Nevyplňujte <input name="web" tabindex="-1" autocomplete="off"></label></p>
+        <div class="row">
+          <div class="field"><label for="jmeno">Jméno</label><input id="jmeno" name="jmeno" autocomplete="given-name" required></div>
+          <div class="field"><label for="prijmeni">Příjmení</label><input id="prijmeni" name="prijmeni" autocomplete="family-name"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="telefon">Telefon</label><input id="telefon" name="telefon" type="tel" autocomplete="tel"></div>
+        </div>
+        <div class="field"><label for="kdo">Jsem</label>
+          <select id="kdo" name="kdo">
+            <option value="">Vyber možnost</option>
+            <option>Člověk ve výkonu trestu</option>
+            <option>Rodina nebo blízký</option>
+            <option>Před nástupem trestu</option>
+            <option>Odborník nebo organizace</option>
+            <option>Dárce nebo partner</option>
+          </select>
+        </div>
+        <div class="field"><label for="zprava">Zpráva</label><textarea id="zprava" name="zprava" required placeholder="Jak ti můžeme pomoct?"></textarea></div>
+        <label class="consent"><input type="checkbox" name="souhlas" required> <span>Souhlasím se zpracováním osobních údajů za účelem vyřízení zprávy. <a href="ochrana-osobnich-udaju.html">Ochrana osobních údajů</a></span></label>
+        <button class="btn btn-yellow" type="submit">Odeslat zprávu <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+      <div class="form-ok" role="status">
+        <h3>Díky, zpráva dorazila.</h3>
+        <p>Ozveme se ti co nejdřív, obvykle do dvou pracovních dnů.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <a class="brand" href="#top">
+        <img class="logo-mark" src="img/logo/reentry-znak.svg" alt="" width="48" height="48">
+        <span><b>REENTRY</b><small>Institut podmíněného propuštění</small></span>
+      </a>
+      <ul class="foot-nav">
+        <li><a href="#o-nas">O nás</a></li>
+        <li><a href="#jak-fungujeme">Jak fungujeme</a></li>
+        <li><a href="#pro-koho">Pro koho</a></li>
+        <li><a href="#tym">Tým</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+    </div>
+    <div class="legal">
+      <span>© 2026 REENTRY – Institut podmíněného propuštění, z. s. · IČO 300 33 411 · Děčínská 552/1, Střížkov, 180 00 Praha 8<br>Spolek zapsaný ve spolkovém rejstříku vedeném Městským soudem v Praze, oddíl L, vložka 82398</span>
+      <span><a href="ochrana-osobnich-udaju.html">Ochrana osobních údajů</a> · <a href="checklist.html">Checklist týmu</a> · <a href="reentry-crm.html">CRM</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Header shadow
+  const header = document.querySelector('header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 10);
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // Mobile menu
+  const btn = document.getElementById('menuBtn'), nav = document.getElementById('nav');
+  btn.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+    btn.setAttribute('aria-label', open ? 'Zavřít menu' : 'Otevřít menu');
+  });
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { nav.classList.remove('open'); btn.setAttribute('aria-expanded', false); }));
+
+  // Hero slideshow
+  (() => {
+    const slides = [...document.querySelectorAll('.hero-art .slide')];
+    const dots = document.querySelector('.hero-art .dots');
+    if (slides.length < 2) return;
+    let i = 0, timer;
+    slides.forEach((_, k) => { const b = document.createElement('button'); b.setAttribute('aria-label', 'Obrázek ' + (k + 1)); if (!k) b.classList.add('on'); b.addEventListener('click', () => { go(k); restart(); }); dots.appendChild(b); });
+    const go = k => { slides[i].classList.remove('on'); dots.children[i].classList.remove('on'); i = k; slides[i].classList.add('on'); dots.children[i].classList.add('on'); };
+    const restart = () => { clearInterval(timer); if (!matchMedia('(prefers-reduced-motion: reduce)').matches) timer = setInterval(() => go((i + 1) % slides.length), 6000); };
+    document.addEventListener('visibilitychange', () => document.hidden ? clearInterval(timer) : restart());
+    restart();
+  })();
+  document.querySelector('.hero-art').removeAttribute('aria-hidden');
+
+  // Reveal on scroll
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 }) : null;
+  document.querySelectorAll('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+
+  // Form (Netlify Forms; on other hosts falls back to e-mail)
+  const form = document.getElementById('form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    try {
+      const r = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() });
+      if (!r.ok) throw new Error(r.status);
+      form.querySelector('.form-fields').style.display = 'none';
+      form.querySelector('.form-ok').style.display = 'block';
+    } catch (err) {
+      const body = `Jméno: ${data.get('jmeno')} ${data.get('prijmeni')}\nE-mail: ${data.get('email')}\nTelefon: ${data.get('telefon')}\nJsem: ${data.get('kdo')}\n\n${data.get('zprava')}`;
+      window.location.href = 'mailto:info@reentry.cz?subject=' + encodeURIComponent('Zpráva z webu REENTRY') + '&body=' + encodeURIComponent(body);
+    }
+  });
+</script>
+</body>
+</html>
