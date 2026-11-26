@@ -113,6 +113,14 @@ window.REENTRY_CHECKLIST = [
       { id: 'sy-zprava', t: 'CRM: automatický podklad pro výstupní zprávu', stav: 'nezacato' },
       { id: 'sy-zaloha', t: 'Zálohy a zabezpečení dat (kdo co vidí, mazání po skončení)', stav: 'nezacato' },
       { id: 'sy-test', t: 'Test systému na modelovém klientovi', stav: 'nezacato' },
+      { id: 'sy-render', t: 'CRM: server a databáze na Renderu (místo ukládání v prohlížeči)', d: 'Nutné před zadáním skutečných klientů.', stav: 'nezacato' },
+      { id: 'sy-zprava-pdf', t: 'CRM: tlačítko „Vytvořit zprávu pro soud“ jako PDF', d: 'Teď jen vyskočí hláška „bude v další verzi“.', stav: 'nezacato' },
+      { id: 'sy-navsteva', t: 'CRM: plán týdenní návštěvy ve Vinařicích', d: 'Seznam cca 20 klientů na daný týden a co s kým probrat.', stav: 'nezacato' },
+      { id: 'sy-prihlasky', t: 'CRM: přihlášky z webu rovnou jako noví zájemci', stav: 'nezacato' },
+      { id: 'sy-ch-terminy', t: 'Checklist: upozornění na termíny', d: 'Po termínu červeně, blíží se oranžově, nahoře přehled „tento týden“.', stav: 'nezacato' },
+      { id: 'sy-ch-kdo', t: 'Checklist: kdo co naposledy změnil', d: 'U každého bodu např. „upravil Radomil, včera“.', stav: 'nezacato' },
+      { id: 'sy-ch-tisk', t: 'Checklist: tisk / PDF na schůzi', d: 'Jedno tlačítko: co je hotové a co zbývá.', stav: 'nezacato' },
+      { id: 'sy-workspace-pravidla', t: 'Zabezpečit databázi v milan-workspace', d: 'Je otevřená, kdokoli s adresou projektu z ní může číst. Zkontrolovat a opravit pravidla (nastaveno dřív, ne kvůli REENTRY).', stav: 'overit' },
     ]
   },
   {
@@ -129,6 +137,10 @@ window.REENTRY_CHECKLIST = [
       { id: 'we-fotky', t: 'Skutečné fotky týmu na web', stav: 'nezacato' },
       { id: 'we-site', t: 'Sociální sítě (FB, IG, LinkedIn)', d: 'Podklady: strategie, kalendář, připravené příspěvky.', stav: 'nezacato' },
       { id: 'we-tz', t: 'Tisková zpráva k založení spolku', stav: 'nezacato' },
+      { id: 'we-formular-fix', t: 'Kontaktní formulář: zprovoznit na GitHubu', d: 'Teď jen otevře e-mailový program. Zprávy ukládat do Firebase a zobrazit v CRM.', stav: 'nezacato' },
+      { id: 'we-faq', t: 'Sekce Časté otázky pro rodiny', d: 'Kolik to stojí, jak dlouho to trvá, kdy se dá žádat o PP, co když soud zamítne. Podklad: FAQ v dokumentech.', soubor: 'FAQ_Reentry.pdf', stav: 'nezacato' },
+      { id: 'we-dopis', t: 'Návod „Jak nám napsat dopis z věznice“ + vzor dopisu ke stažení', d: 'Adresa a co do dopisu napsat: jméno, věznice, kdy může žádat o PP.', stav: 'nezacato' },
+      { id: 'we-podporte', t: 'Sekce „Podpořte nás“ pro dárce', d: 'Krátký text, odkaz na projekt v PDF, později číslo transparentního účtu.', stav: 'nezacato' },
     ]
   },
   {
