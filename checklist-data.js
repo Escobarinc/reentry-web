@@ -137,7 +137,7 @@ window.REENTRY_CHECKLIST = [
       { id: 'sy-ch-kdo', t: 'Checklist: kdo co naposledy změnil', d: 'U každého bodu např. „upravil Radomil, včera“.', stav: 'nezacato' },
       { id: 'sy-ch-tisk', t: 'Checklist: tisk / PDF na schůzi', d: 'Jedno tlačítko: co je hotové a co zbývá.', stav: 'nezacato' },
       { id: 'sy-workspace-pravidla', t: 'Zabezpečit databázi v milan-workspace', d: 'Je otevřená, kdokoli s adresou projektu z ní může číst. Zkontrolovat a opravit pravidla (nastaveno dřív, ne kvůli REENTRY).', stav: 'overit' },
-      { id: 'sy-crm-audit', t: 'CRM: projít všechna tlačítka a sekce, opravit nefunkční věci a nesmysly', stav: 'rozpracovano' },
+      { id: 'sy-crm-audit', t: 'CRM: projít všechna tlačítka a sekce, opravit nefunkční věci a nesmysly', stav: 'hotovo' },
       { id: 'sy-dotace', t: 'CRM: sekce Dotace (programy, termíny, podmínky, stav žádosti)', stav: 'hotovo' },
       { id: 'sy-dotace-auto', t: 'Automatické týdenní hledání nových dotací do CRM', d: 'Úloha „REENTRY: týdenní hledání dotací“ každé pondělí v 8:00 (běží, když je aplikace Claude otevřená).', stav: 'hotovo' },
       { id: 'sy-ucetnictvi', t: 'CRM: sekce Účetnictví (peněžní deník, dary, přehledy, export)', d: 'Stránka crm-ucetnictvi.html: peněžní deník, přehledy, dary s potvrzením, CSV export, záloha. Zatím ukládá jen v prohlížeči.', stav: 'hotovo' },
