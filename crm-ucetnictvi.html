@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Účetnictví – REENTRY CRM</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="img/logo/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crm-shell.css">
+<style>
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 16px; overflow-x: auto; }
+  .tab { padding: 10px 14px; border: 0; background: none; cursor: pointer; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+  .tab.on { color: var(--navy); border-bottom-color: var(--orange); }
+  .pane { display: none; }
+  .pane.on { display: block; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bar { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .bar i { display: block; height: 100%; background: var(--navy-mid); }
+  .bar.inc i { background: var(--success); }
+  .row-actions { white-space: nowrap; }
+  .receipt { max-width: 640px; margin: 0 auto; padding: 40px; background: #fff; font-size: 14px; line-height: 1.6; }
+  .receipt h2 { font-size: 20px; margin: 18px 0 14px; }
+  .receipt .hdr { display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+  .receipt .hdr img { width: 44px; height: 44px; }
+  .receipt table td { padding: 4px 0; vertical-align: top; }
+  .receipt table td:first-child { color: var(--text-muted); width: 170px; }
+  .sign { margin-top: 48px; display: flex; justify-content: space-between; gap: 20px; }
+  .sign div { border-top: 1px solid var(--text); padding-top: 4px; min-width: 200px; font-size: 12.5px; }
+  @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+  @media print { body.printing .main > *:not(#printArea) { display: none !important; } #printArea { display: block !important; } }
+</style>
+</head>
+<body data-page="ucetnictvi">
+<div class="main">
+  <header class="topbar">
+    <button class="hamburger" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <h1>Účetnictví<span class="sub">peněžní deník a dary spolku</span></h1>
+    <div class="actions">
+      <select class="btn" id="year" aria-label="Rok"></select>
+      <button class="btn btn-primary" id="addBtn">+ Nový záznam</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="notice warn">
+      <div><b>Data se zatím ukládají jen v tomto prohlížeči.</b> Pravidelně si dělejte zálohu (tlačítko „Stáhnout zálohu“ dole) a ukládejte ji do složky DOKUMENTY. Sdílení pro celý tým přijde se zabezpečenou verzí s přihlášením. Jednoduché účetnictví smí spolek vést, jen pokud nepřijímá dotace z veřejných rozpočtů a má příjmy do 3 mil. Kč ročně. První závěrku nechte zkontrolovat účetní.</div>
+    </div>
+
+    <div class="grid-stats" id="stats"></div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="denik" role="tab">Peněžní deník</button>
+      <button class="tab" data-tab="prehled" role="tab">Přehled podle kategorií</button>
+      <button class="tab" data-tab="dary" role="tab">Dary a dárci</button>
+      <button class="tab" data-tab="zaloha" role="tab">Záloha a export</button>
+    </div>
+
+    <section class="pane on" id="p-denik">
+      <div class="toolbar">
+        <button class="chip on" data-f="all">Vše</button>
+        <button class="chip" data-f="prijem">Příjmy</button>
+        <button class="chip" data-f="vydaj">Výdaje</button>
+        <select id="fMonth" aria-label="Měsíc"><option value="">Celý rok</option></select>
+        <input type="search" id="q" placeholder="Hledat v popisu, partnerovi…" aria-label="Hledat">
+      </div>
+      <div class="card t-wrap"><table class="t" id="tbl"></table></div>
+    </section>
+
+    <section class="pane" id="p-prehled">
+      <div class="two">
+        <div class="card"><div class="card-h"><h2>Příjmy podle kategorií</h2></div><div class="card-b" id="catInc"></div></div>
+        <div class="card"><div class="card-h"><h2>Výdaje podle kategorií</h2></div><div class="card-b" id="catExp"></div></div>
+      </div>
+      <div class="card" style="margin-top:16px"><div class="card-h"><h2>Po měsících</h2></div><div class="t-wrap"><table class="t" id="months"></table></div></div>
+    </section>
+
+    <section class="pane" id="p-dary">
+      <div class="notice"><div>Dar je příjem v kategorii <b>Dary</b>. U každého daru můžete vytisknout <b>potvrzení o daru</b> pro dárce (k odečtu ze základu daně). Zkontrolujte s účetní, že potvrzení odpovídá vašim pravidlům.</div></div>
+      <div class="card t-wrap"><table class="t" id="donors"></table></div>
+    </section>
+
+    <section class="pane" id="p-zaloha">
+      <div class="two">
+        <div class="card"><div class="card-h"><h2>Záloha</h2></div><div class="card-b">
+          <p>Stáhne všechna data účetnictví do jednoho souboru. Ten si uložte do <b>DOKUMENTY/04_Finance_granty</b>.</p>
+          <p style="margin-top:12px"><button class="btn btn-primary" id="backup">Stáhnout zálohu</button> <label class="btn">Obnovit ze zálohy<input type="file" id="restore" accept="application/json" hidden></label></p>
+          <p class="muted" style="margin-top:10px" id="lastBackup"></p>
+        </div></div>
+        <div class="card"><div class="card-h"><h2>Export pro účetní</h2></div><div class="card-b">
+          <p>Tabulka všech záznamů vybraného roku pro účetní nebo Excel.</p>
+          <p style="margin-top:12px"><button class="btn" id="csv">Exportovat CSV (Excel)</button> <button class="btn" id="printDenik">Vytisknout deník</button></p>
+        </div></div>
+      </div>
+    </section>
+
+    <div id="printArea" style="display:none"></div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <div class="card-h"><h2 id="dlgTitle">Nový záznam</h2></div>
+    <div class="card-b">
+      <div class="form-grid">
+        <div><label class="f" for="e_typ">Typ</label><select class="in" id="e_typ"><option value="prijem">Příjem</option><option value="vydaj">Výdaj</option></select></div>
+        <div><label class="f" for="e_datum">Datum</label><input class="in" type="date" id="e_datum" required></div>
+        <div><label class="f" for="e_castka">Částka (Kč)</label><input class="in" type="number" id="e_castka" min="0" step="0.01" required></div>
+        <div><label class="f" for="e_kat">Kategorie</label><select class="in" id="e_kat"></select></div>
+        <div><label class="f" for="e_uhrada">Úhrada</label><select class="in" id="e_uhrada"><option value="banka">Bankovní účet</option><option value="pokladna">Hotově (pokladna)</option></select></div>
+        <div><label class="f" for="e_doklad">Číslo dokladu</label><input class="in" id="e_doklad" placeholder="doplní se samo"></div>
+        <div style="grid-column:1/-1"><label class="f" for="e_popis">Popis</label><input class="in" id="e_popis" required placeholder="Např. nájem kanceláře – leden"></div>
+        <div style="grid-column:1/-1"><label class="f" for="e_partner" id="l_partner">Dodavatel / odběratel</label><input class="in" id="e_partner"></div>
+        <div style="grid-column:1/-1" id="donorBox" hidden>
+          <div class="form-grid">
+            <div><label class="f" for="e_dadresa">Adresa dárce</label><input class="in" id="e_dadresa"></div>
+            <div><label class="f" for="e_dico">IČO / datum narození dárce</label><input class="in" id="e_dico"></div>
+          </div>
+        </div>
+        <div style="grid-column:1/-1"><label class="f" for="e_pozn">Poznámka</label><textarea class="in" id="e_pozn"></textarea></div>
+      </div>
+    </div>
+    <div class="foot"><button class="btn" value="cancel" formnovalidate>Zrušit</button><button class="btn btn-primary" value="ok">Uložit</button></div>
+  </form>
+</dialog>
+
+<script src="crm-shell.js"></script>
+<script>
+(() => {
+  const { esc, kc, dt, today, download } = window.CRM;
+  const $ = s => document.querySelector(s);
+  const KEY = 'reentry_ucetnictvi_v1';
+  const KAT = {
+    prijem: ['Dary', 'Dotace a granty', 'Členské příspěvky', 'Tržby za služby', 'Úroky', 'Ostatní příjmy'],
+    vydaj: ['Materiál a vybavení', 'Služby (web, software, tisk)', 'Nájem a energie', 'Cestovné', 'Mzdy a odměny', 'Pojištění', 'Poplatky (banka, úřady)', 'Propagace', 'Ostatní výdaje'],
+  };
+  const MES = ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'];
+  let data = { zaznamy: [], posledniZaloha: null };
+  try { data = { ...data, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { alert('Uložení v prohlížeči se nepovedlo. Stáhněte si zálohu.'); } };
+  let year = new Date().getFullYear(), filter = 'all', month = '', q = '', editId = null;
+
+  // rok
+  const years = () => { const ys = new Set([new Date().getFullYear(), ...data.zaznamy.map(z => +z.datum.slice(0, 4))]); return [...ys].sort((a, b) => b - a); };
+  function fillYears() { $('#year').innerHTML = years().map(y => `<option ${y === year ? 'selected' : ''}>${y}</option>`).join(''); }
+  $('#fMonth').innerHTML += MES.map((m, i) => `<option value="${String(i + 1).padStart(2, '0')}">${m}</option>`).join('');
+
+  const inYear = () => data.zaznamy.filter(z => z.datum.startsWith(String(year)));
+  const sum = (arr, typ) => arr.filter(z => z.typ === typ).reduce((a, z) => a + Number(z.castka), 0);
+  const nextDoklad = typ => { const p = (typ === 'prijem' ? 'P' : 'V') + year + '-'; const n = data.zaznamy.filter(z => (z.doklad || '').startsWith(p)).length + 1; return p + String(n).padStart(3, '0'); };
+
+  function render() {
+    fillYears();
+    const z = inYear();
+    const inc = sum(z, 'prijem'), exp = sum(z, 'vydaj');
+    const bal = (u) => data.zaznamy.filter(x => x.uhrada === u).reduce((a, x) => a + (x.typ === 'prijem' ? 1 : -1) * Number(x.castka), 0);
+    $('#stats').innerHTML = `
+      <div class="card stat"><div class="l">Příjmy ${year}</div><div class="n pos">${kc(inc)}</div></div>
+      <div class="card stat"><div class="l">Výdaje ${year}</div><div class="n neg">${kc(exp)}</div></div>
+      <div class="card stat"><div class="l">Výsledek ${year}</div><div class="n ${inc - exp >= 0 ? 'pos' : 'neg'}">${kc(inc - exp)}</div></div>
+      <div class="card stat"><div class="l">Na účtu</div><div class="n">${kc(bal('banka'))}</div><div class="s">podle záznamů</div></div>
+      <div class="card stat"><div class="l">V pokladně</div><div class="n">${kc(bal('pokladna'))}</div><div class="s">podle záznamů</div></div>`;
+
+    // deník
+    const rows = z.filter(x => (filter === 'all' || x.typ === filter) && (!month || x.datum.slice(5, 7) === month)
+      && (!q || (x.popis + ' ' + (x.partner || '') + ' ' + (x.doklad || '') + ' ' + x.kategorie).toLowerCase().includes(q)))
+      .sort((a, b) => a.datum.localeCompare(b.datum) || (a.doklad || '').localeCompare(b.doklad || ''));
+    $('#tbl').innerHTML = `<thead><tr><th>Datum</th><th>Doklad</th><th>Popis</th><th>Kategorie</th><th>Úhrada</th><th class="num">Příjem</th><th class="num">Výdaj</th><th></th></tr></thead><tbody>${
+      rows.length ? rows.map(x => `<tr data-id="${x.id}">
+        <td>${dt(x.datum)}</td><td>${esc(x.doklad)}</td>
+        <td>${esc(x.popis)}${x.partner ? `<br><span class="muted">${esc(x.partner)}</span>` : ''}</td>
+        <td><span class="pill">${esc(x.kategorie)}</span></td>
+        <td>${x.uhrada === 'pokladna' ? 'hotově' : 'účet'}</td>
+        <td class="num pos">${x.typ === 'prijem' ? kc(x.castka) : ''}</td>
+        <td class="num neg">${x.typ === 'vydaj' ? kc(x.castka) : ''}</td>
+        <td class="row-actions"><button class="btn btn-sm" data-act="edit">Upravit</button> <button class="btn btn-sm btn-danger" data-act="del" aria-label="Smazat">✕</button></td>
+      </tr>`).join('') + `<tr><td colspan="5"><b>Celkem (${rows.length} ${rows.length === 1 ? 'záznam' : rows.length < 5 ? 'záznamy' : 'záznamů'})</b></td><td class="num pos">${kc(sum(rows, 'prijem'))}</td><td class="num neg">${kc(sum(rows, 'vydaj'))}</td><td></td></tr>`
+      : `<tr><td colspan="8"><div class="empty">Zatím žádné záznamy. Klikněte na „+ Nový záznam“.</div></td></tr>`}</tbody>`;
+
+    // kategorie
+    const catHtml = typ => { const t = sum(z, typ) || 1; const cats = KAT[typ].map(k => [k, z.filter(x => x.typ === typ && x.kategorie === k).reduce((a, x) => a + Number(x.castka), 0)]).filter(c => c[1] > 0).sort((a, b) => b[1] - a[1]);
+      return cats.length ? cats.map(([k, v]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${esc(k)}</span><b>${kc(v)}</b></div><div class="bar ${typ === 'prijem' ? 'inc' : ''}"><i style="width:${v / t * 100}%"></i></div></div>`).join('') : '<div class="muted">Žádné záznamy.</div>'; };
+    $('#catInc').innerHTML = catHtml('prijem'); $('#catExp').innerHTML = catHtml('vydaj');
+    $('#months').innerHTML = `<thead><tr><th>Měsíc</th><th class="num">Příjmy</th><th class="num">Výdaje</th><th class="num">Výsledek</th></tr></thead><tbody>${MES.map((m, i) => { const mm = z.filter(x => +x.datum.slice(5, 7) === i + 1); const a = sum(mm, 'prijem'), b = sum(mm, 'vydaj'); return `<tr><td>${m}</td><td class="num">${a ? kc(a) : '—'}</td><td class="num">${b ? kc(b) : '—'}</td><td class="num ${a - b < 0 ? 'neg' : ''}">${a || b ? kc(a - b) : '—'}</td></tr>`; }).join('')}<tr><td><b>Celkem</b></td><td class="num"><b>${kc(inc)}</b></td><td class="num"><b>${kc(exp)}</b></td><td class="num"><b>${kc(inc - exp)}</b></td></tr></tbody>`;
+
+    // dary
+    const gifts = z.filter(x => x.typ === 'prijem' && x.kategorie === 'Dary').sort((a, b) => a.datum.localeCompare(b.datum));
+    $('#donors').innerHTML = `<thead><tr><th>Datum</th><th>Dárce</th><th>Doklad</th><th class="num">Částka</th><th></th></tr></thead><tbody>${
+      gifts.length ? gifts.map(x => `<tr data-id="${x.id}"><td>${dt(x.datum)}</td><td>${esc(x.partner || '—')}</td><td>${esc(x.doklad)}</td><td class="num pos">${kc(x.castka)}</td><td class="row-actions"><button class="btn btn-sm" data-act="receipt">Potvrzení o daru</button></td></tr>`).join('') + `<tr><td colspan="3"><b>Dary celkem ${year}</b></td><td class="num pos"><b>${kc(sum(gifts, 'prijem'))}</b></td><td></td></tr>`
+      : `<tr><td colspan="5"><div class="empty">Zatím žádné dary v roce ${year}.</div></td></tr>`}</tbody>`;
+    $('#lastBackup').textContent = data.posledniZaloha ? 'Poslední záloha: ' + new Date(data.posledniZaloha).toLocaleString('cs-CZ') : 'Zatím jste zálohu nestáhli.';
+  }
+
+  // formulář
+  function fillKat(typ, sel) { $('#e_kat').innerHTML = KAT[typ].map(k => `<option ${k === sel ? 'selected' : ''}>${k}</option>`).join(''); }
+  function toggleDonor() { const isGift = $('#e_typ').value === 'prijem' && $('#e_kat').value === 'Dary'; $('#donorBox').hidden = !isGift; $('#l_partner').textContent = isGift ? 'Dárce (jméno / firma)' : ($('#e_typ').value === 'prijem' ? 'Od koho' : 'Dodavatel'); }
+  $('#e_typ').addEventListener('change', () => { fillKat($('#e_typ').value); toggleDonor(); });
+  $('#e_kat').addEventListener('change', toggleDonor);
+  function openForm(z) {
+    editId = z ? z.id : null;
+    $('#dlgTitle').textContent = z ? 'Upravit záznam' : 'Nový záznam';
+    $('#form').reset();
+    $('#e_typ').value = z?.typ || 'vydaj'; fillKat($('#e_typ').value, z?.kategorie);
+    $('#e_datum').value = z?.datum || today(); $('#e_castka').value = z?.castka ?? ''; $('#e_uhrada').value = z?.uhrada || 'banka';
+    $('#e_doklad').value = z?.doklad || ''; $('#e_popis').value = z?.popis || ''; $('#e_partner').value = z?.partner || '';
+    $('#e_dadresa').value = z?.darceAdresa || ''; $('#e_dico').value = z?.darceId || ''; $('#e_pozn').value = z?.poznamka || '';
+    toggleDonor(); $('#dlg').showModal();
+  }
+  $('#addBtn').addEventListener('click', () => openForm(null));
+  $('#dlg').addEventListener('close', () => {
+    if ($('#dlg').returnValue !== 'ok') return;
+    const castka = Math.round(Number($('#e_castka').value) * 100) / 100;
+    if (!(castka > 0) || !$('#e_datum').value || !$('#e_popis').value.trim()) { alert('Vyplňte datum, částku a popis.'); return; }
+    const typ = $('#e_typ').value;
+    const rec = { id: editId || 'z' + Date.now().toString(36), typ, datum: $('#e_datum').value, castka, kategorie: $('#e_kat').value, uhrada: $('#e_uhrada').value,
+      popis: $('#e_popis').value.trim(), partner: $('#e_partner').value.trim(), darceAdresa: $('#e_dadresa').value.trim(), darceId: $('#e_dico').value.trim(), poznamka: $('#e_pozn').value.trim() };
+    rec.doklad = $('#e_doklad').value.trim() || (editId ? data.zaznamy.find(x => x.id === editId)?.doklad : '') || nextDoklad(typ);
+    data.zaznamy = editId ? data.zaznamy.map(x => x.id === editId ? rec : x) : [...data.zaznamy, rec];
+    year = +rec.datum.slice(0, 4); save(); render();
+  });
+
+  // potvrzení o daru
+  function receipt(z) {
+    const html = `<div class="receipt">
+      <div class="hdr"><img src="img/logo/reentry-znak.svg" alt=""><div><b>REENTRY – Institut podmíněného propuštění, z. s.</b><br><span class="muted">IČO 300 33 411 · Děčínská 552/1, Střížkov, 180 00 Praha 8<br>Zapsán ve spolkovém rejstříku u Městského soudu v Praze, L 82398</span></div></div>
+      <h2>Potvrzení o přijetí daru</h2>
+      <p>Spolek REENTRY – Institut podmíněného propuštění, z. s., potvrzuje, že přijal tento dar:</p>
+      <table style="margin:14px 0">
+        <tr><td>Dárce</td><td><b>${esc(z.partner || '')}</b></td></tr>
+        <tr><td>Adresa</td><td>${esc(z.darceAdresa || '')}</td></tr>
+        <tr><td>IČO / datum narození</td><td>${esc(z.darceId || '')}</td></tr>
+        <tr><td>Částka</td><td><b>${kc(z.castka)}</b></td></tr>
+        <tr><td>Datum přijetí</td><td>${dt(z.datum)}</td></tr>
+        <tr><td>Způsob úhrady</td><td>${z.uhrada === 'pokladna' ? 'v hotovosti' : 'bankovním převodem'}</td></tr>
+        <tr><td>Číslo dokladu</td><td>${esc(z.doklad)}</td></tr>
+      </table>
+      <p>Dar je určen na podporu činnosti spolku: odbornou a metodickou podporu osob ve výkonu trestu odnětí svobody, zejména při přípravě k podmíněnému propuštění. Dar byl poskytnut bezúplatně a dárci za něj nebylo poskytnuto žádné protiplnění.</p>
+      <p style="margin-top:10px">Potvrzení slouží k uplatnění odpočtu daru od základu daně podle zákona o daních z příjmů.</p>
+      <p style="margin-top:22px">V Praze dne ${dt(today())}</p>
+      <div class="sign"><div>Razítko spolku</div><div>Radomil Petřík, předseda spolku</div></div>
+    </div>`;
+    printHtml(html);
+  }
+  function printHtml(html) { $('#printArea').innerHTML = html; document.body.classList.add('printing'); setTimeout(() => { window.print(); document.body.classList.remove('printing'); }, 150); }
+
+  // klikání
+  document.addEventListener('click', e => {
+    const tab = e.target.closest('.tab');
+    if (tab) { document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t === tab)); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'p-' + tab.dataset.tab)); return; }
+    const chip = e.target.closest('.chip');
+    if (chip) { document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === chip)); filter = chip.dataset.f; render(); return; }
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    const z = data.zaznamy.find(x => x.id === a.closest('tr').dataset.id); if (!z) return;
+    if (a.dataset.act === 'edit') openForm(z);
+    if (a.dataset.act === 'del' && confirm(`Smazat záznam ${z.doklad} (${kc(z.castka)})?`)) { data.zaznamy = data.zaznamy.filter(x => x.id !== z.id); save(); render(); }
+    if (a.dataset.act === 'receipt') receipt(z);
+  });
+  $('#year').addEventListener('change', e => { year = +e.target.value; render(); });
+  $('#fMonth').addEventListener('change', e => { month = e.target.value; render(); });
+  $('#q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); render(); });
+
+  // záloha / export
+  $('#backup').addEventListener('click', () => { data.posledniZaloha = Date.now(); save(); download(`REENTRY_ucetnictvi_zaloha_${today()}.json`, JSON.stringify({ format: 'reentry-ucetnictvi', verze: 1, ...data }, null, 2), 'application/json'); render(); });
+  $('#restore').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { const d = JSON.parse(await f.text()); if (d.format !== 'reentry-ucetnictvi' || !Array.isArray(d.zaznamy)) throw new Error('To není záloha účetnictví REENTRY.');
+      if (!confirm(`Obnovit ${d.zaznamy.length} záznamů ze zálohy? Současná data v tomto prohlížeči se nahradí.`)) return;
+      data = { zaznamy: d.zaznamy, posledniZaloha: d.posledniZaloha || null }; save(); render(); alert('Obnoveno.');
+    } catch (er) { alert('Zálohu se nepodařilo načíst: ' + er.message); }
+    e.target.value = '';
+  });
+  $('#csv').addEventListener('click', () => {
+    const q2 = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+    const rows = [['Datum', 'Doklad', 'Typ', 'Kategorie', 'Popis', 'Partner / dárce', 'Úhrada', 'Částka', 'Poznámka'].map(q2).join(';'),
+      ...inYear().sort((a, b) => a.datum.localeCompare(b.datum)).map(z => [dt(z.datum), z.doklad, z.typ === 'prijem' ? 'Příjem' : 'Výdaj', z.kategorie, z.popis, z.partner, z.uhrada === 'pokladna' ? 'Hotově' : 'Účet', String(z.castka).replace('.', ','), z.poznamka].map(q2).join(';'))];
+    download(`REENTRY_penezni_denik_${year}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
+  });
+  $('#printDenik').addEventListener('click', () => {
+    const z = inYear().sort((a, b) => a.datum.localeCompare(b.datum));
+    printHtml(`<div style="padding:20px"><h2 style="font-size:18px;margin-bottom:4px">Peněžní deník ${year}</h2><p class="muted" style="margin-bottom:12px">REENTRY – Institut podmíněného propuštění, z. s. · IČO 300 33 411</p><table class="t"><thead><tr><th>Datum</th><th>Doklad</th><th>Popis</th><th>Kategorie</th><th class="num">Příjem</th><th class="num">Výdaj</th></tr></thead><tbody>${z.map(x => `<tr><td>${dt(x.datum)}</td><td>${esc(x.doklad)}</td><td>${esc(x.popis)}${x.partner ? ' – ' + esc(x.partner) : ''}</td><td>${esc(x.kategorie)}</td><td class="num">${x.typ === 'prijem' ? kc(x.castka) : ''}</td><td class="num">${x.typ === 'vydaj' ? kc(x.castka) : ''}</td></tr>`).join('')}<tr><td colspan="4"><b>Celkem</b></td><td class="num"><b>${kc(sum(z, 'prijem'))}</b></td><td class="num"><b>${kc(sum(z, 'vydaj'))}</b></td></tr></tbody></table></div>`);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

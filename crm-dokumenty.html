@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dokumenty – REENTRY CRM</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="img/logo/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crm-shell.css">
+<style>
+  .cat { margin-bottom: 16px; }
+  .doc { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 11px 18px; border-bottom: 1px solid var(--border); }
+  .doc:last-child { border-bottom: 0; }
+  .ext { width: 40px; height: 40px; border-radius: 8px; background: var(--bg); display: grid; place-items: center; font-size: 10.5px; font-weight: 700; color: var(--navy-mid); }
+  .ext.pdf { background: #fdecea; color: #c0392b; }
+  .doc b { font-weight: 600; display: block; }
+  .path { font-size: 12px; color: var(--text-muted); word-break: break-all; }
+  .doc .r { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .copy { cursor: pointer; }
+  @media (max-width: 640px) { .doc { grid-template-columns: 36px 1fr; } .doc .r { grid-column: 2; justify-content: flex-start; } }
+</style>
+</head>
+<body data-page="dokumenty">
+<div class="main">
+  <header class="topbar">
+    <button class="hamburger" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <h1>Dokumenty<span class="sub">všechno pod jednou střechou</span></h1>
+  </header>
+  <div class="content">
+    <div class="notice warn">
+      <div><b>Zatím jen přehled, bez stahování.</b> CRM je teď bez hesla, a proto soubory samotné na internetu nejsou (metodika je vaše know-how, některé dokumenty obsahují osobní údaje). Stahování zapneme ve verzi s přihlášením. Do té doby najdete každý dokument v počítači podle cesty, která je u něj napsaná (složka <b>Documents/REENTRY</b>).</div>
+    </div>
+    <div class="grid-stats" id="stats"></div>
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Hledat dokument…" aria-label="Hledat">
+      <select id="cat" aria-label="Kategorie"><option value="">Všechny kategorie</option></select>
+      <label class="chip"><input type="checkbox" id="vars" style="margin-right:6px">Zobrazit i starší varianty</label>
+    </div>
+    <div id="list"></div>
+  </div>
+</div>
+<script src="crm-shell.js"></script>
+<script src="dokumenty-data.js"></script>
+<script>
+(() => {
+  const { esc } = window.CRM;
+  const $ = s => document.querySelector(s);
+  const D = window.REENTRY_DOKUMENTY || [];
+  const cats = [...new Set(D.map(d => d.kategorie))];
+  $('#cat').innerHTML += cats.map(c => `<option>${esc(c)}</option>`).join('');
+  $('#stats').innerHTML = `
+    <div class="card stat"><div class="l">Dokumentů</div><div class="n">${D.filter(d => !d.varianta).length}</div><div class="s">+ ${D.filter(d => d.varianta).length} starších variant</div></div>
+    <div class="card stat"><div class="l">Kategorií</div><div class="n">${cats.length}</div></div>
+    <div class="card stat"><div class="l">S osobními údaji</div><div class="n">${D.filter(d => d.osobni).length}</div><div class="s">jen po přihlášení</div></div>
+    <div class="card stat"><div class="l">Seznam aktualizován</div><div class="n" style="font-size:18px">${esc(window.REENTRY_DOKUMENTY_AKTUALIZACE || '')}</div></div>`;
+  function render() {
+    const q = $('#q').value.trim().toLowerCase(), c = $('#cat').value, v = $('#vars').checked;
+    const vis = D.filter(d => (v || !d.varianta) && (!c || d.kategorie === c) && (!q || (d.nazev + ' ' + d.soubor).toLowerCase().includes(q)));
+    $('#list').innerHTML = cats.filter(k => vis.some(d => d.kategorie === k)).map(k => `
+      <div class="card cat"><div class="card-h"><h2>${esc(k)}</h2><span class="muted" style="margin-left:auto">${vis.filter(d => d.kategorie === k).length}</span></div>
+      ${vis.filter(d => d.kategorie === k).map(d => `<div class="doc">
+        <div class="ext ${d.typ === 'PDF' ? 'pdf' : ''}">${esc(d.typ)}</div>
+        <div><b>${esc(d.nazev)}</b><span class="path">${esc(d.cesta)}</span></div>
+        <div class="r">${d.osobni ? '<span class="pill warn">osobní údaje</span>' : ''}${d.varianta ? '<span class="pill">varianta</span>' : ''}<button class="btn btn-sm copy" data-path="${esc(d.cesta)}">Kopírovat cestu</button><button class="btn btn-sm" disabled title="Stahování až ve verzi s přihlášením">Stáhnout</button></div>
+      </div>`).join('')}</div>`).join('') || '<div class="card empty">Nic nenalezeno.</div>';
+  }
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('.copy'); if (!b) return;
+    try { await navigator.clipboard.writeText('Documents/REENTRY/' + b.dataset.path); b.textContent = 'Zkopírováno ✓'; } catch (er) { b.textContent = 'Nejde kopírovat'; }
+    setTimeout(() => { b.textContent = 'Kopírovat cestu'; }, 1500);
+  });
+  ['input', 'change'].forEach(ev => document.addEventListener(ev, e => { if (e.target.matches('#q,#cat,#vars')) render(); }));
+  render();
+})();
+</script>
+</body>
+</html>

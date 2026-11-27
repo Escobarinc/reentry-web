@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dotace – REENTRY CRM</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="img/logo/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crm-shell.css">
+<style>
+  .prog { padding: 16px 18px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 220px; gap: 16px; }
+  .prog:last-child { border-bottom: 0; }
+  .prog h3 { font-size: 15px; font-weight: 700; line-height: 1.35; }
+  .prog .who { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+  .prog .desc { font-size: 13px; margin-top: 8px; }
+  .prog dl { display: grid; grid-template-columns: 110px 1fr; gap: 3px 10px; font-size: 12.5px; margin-top: 10px; }
+  .prog dt { color: var(--text-muted); }
+  .prog .side { display: flex; flex-direction: column; gap: 8px; }
+  .prog .side select, .prog .side textarea { width: 100%; padding: 7px 9px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #fff; font-size: 13px; }
+  .prog .side textarea { min-height: 64px; resize: vertical; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .deadline { font-weight: 600; }
+  .src { font-size: 11.5px; color: var(--text-light); margin-top: 6px; }
+  .saved { font-size: 11.5px; color: var(--text-light); }
+  @media (max-width: 900px) { .prog { grid-template-columns: 1fr; } .prog dl { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="dotace">
+<div class="main">
+  <header class="topbar">
+    <button class="hamburger" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <h1>Dotace a granty<span class="sub">programy, na které můžeme dosáhnout</span></h1>
+    <div class="actions"><button class="btn btn-primary" id="addBtn">+ Přidat program</button></div>
+  </header>
+
+  <div class="content">
+    <div class="notice" id="sync">Připojuji se ke sdílenému seznamu…</div>
+
+    <div class="grid-stats" id="stats"></div>
+
+    <div class="notice warn">
+      <div><b>Jak to funguje:</b> seznam jednou týdně automaticky doplňuje hledání nových výzev (úloha v Claude, běží když je aplikace otevřená). Poslední aktualizace seznamu: <b id="upd"></b>. U každého programu nastavte stav a pište poznámky, ostatní je uvidí. Termíny vždy ověřte v oficiální výzvě.</div>
+    </div>
+
+    <div class="toolbar" role="toolbar" aria-label="Filtry">
+      <button class="chip on" data-f="all">Vše</button>
+      <button class="chip" data-f="vysoka">Nejvíc se hodí</button>
+      <button class="chip" data-f="aktivni">Rozpracované</button>
+      <button class="chip" data-f="stat">Stát</button>
+      <button class="chip" data-f="eu">EU</button>
+      <button class="chip" data-f="kraj">Kraj a Praha</button>
+      <button class="chip" data-f="nadace">Nadace</button>
+      <button class="chip" data-f="spoluprace">Spolupráce</button>
+      <input type="search" id="q" placeholder="Hledat…" aria-label="Hledat">
+    </div>
+
+    <div class="card" id="list"></div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="addForm">
+    <div class="card-h"><h2>Přidat program</h2></div>
+    <div class="card-b">
+      <div class="form-grid">
+        <div style="grid-column:1/-1"><label class="f" for="a_nazev">Název programu</label><input class="in" id="a_nazev" required></div>
+        <div><label class="f" for="a_posk">Poskytovatel</label><input class="in" id="a_posk"></div>
+        <div><label class="f" for="a_typ">Typ</label><select class="in" id="a_typ"><option value="stat">Stát</option><option value="eu">EU</option><option value="kraj">Kraj / Praha</option><option value="nadace">Nadace</option><option value="spoluprace">Spolupráce</option></select></div>
+        <div><label class="f" for="a_term">Uzávěrka</label><input class="in" type="date" id="a_term"></div>
+        <div><label class="f" for="a_rel">Jak moc se hodí</label><select class="in" id="a_rel"><option value="vysoka">Hodně</option><option value="stredni" selected>Středně</option><option value="nizka">Málo</option></select></div>
+        <div style="grid-column:1/-1"><label class="f" for="a_odkaz">Odkaz na výzvu</label><input class="in" id="a_odkaz" type="url" placeholder="https://"></div>
+        <div style="grid-column:1/-1"><label class="f" for="a_popis">Popis</label><textarea class="in" id="a_popis"></textarea></div>
+      </div>
+    </div>
+    <div class="foot"><button class="btn" value="cancel" formnovalidate>Zrušit</button><button class="btn btn-primary" value="ok">Přidat</button></div>
+  </form>
+</dialog>
+
+<script src="crm-shell.js"></script>
+<script src="dotace-data.js"></script>
+<script type="module">
+  import { FIREBASE_CONFIG } from './firebase-config.js';
+  const { esc, dt, daysTo } = window.CRM;
+  const $ = s => document.querySelector(s);
+  const STAV = [['', 'Nesledujeme'], ['sledujeme', 'Sledujeme'], ['priprava', 'Připravujeme žádost'], ['podano', 'Podáno'], ['schvaleno', 'Schváleno'], ['zamitnuto', 'Zamítnuto'], ['nehodi', 'Nehodí se']];
+  const TYP = { stat: 'Stát', eu: 'EU', kraj: 'Kraj / Praha', nadace: 'Nadace', spoluprace: 'Spolupráce' };
+  const REL = { vysoka: ['Hodí se hodně', 'ok'], stredni: ['Hodí se středně', 'info'], nizka: ['Hodí se málo', ''] };
+  let state = {}, extra = [], filter = 'all', q = '', backend;
+
+  $('#upd').textContent = window.REENTRY_DOTACE_AKTUALIZACE || '';
+  const all = () => [...window.REENTRY_DOTACE, ...extra.map(x => ({ ...x, vlastni: true }))];
+  const cur = p => ({ stav: '', poznamka: '', ...(state[p.id] || {}) });
+
+  function matches(p) {
+    const c = cur(p);
+    if (filter === 'vysoka' && p.relevance !== 'vysoka') return false;
+    if (filter === 'aktivni' && !['priprava', 'podano'].includes(c.stav)) return false;
+    if (TYP[filter] && p.typ !== filter) return false;
+    if (q && !(p.nazev + ' ' + p.poskytovatel + ' ' + (p.popis || '') + ' ' + c.poznamka).toLowerCase().includes(q)) return false;
+    return true;
+  }
+  function deadlineHtml(p) {
+    if (!p.termin) return `<span>${esc(p.uzaverka || 'neuvedeno')}</span>`;
+    const d = daysTo(p.termin);
+    const cls = d < 0 ? 'muted' : d <= 30 ? 'neg' : d <= 90 ? 'deadline' : '';
+    const rel = d < 0 ? 'uplynula' : d === 0 ? 'dnes' : `za ${d} dní`;
+    return `<span class="${cls}">${dt(p.termin)} (${rel})</span>${p.uzaverka ? `<br><span class="muted">${esc(p.uzaverka)}</span>` : ''}`;
+  }
+  function render() {
+    const list = all();
+    const n = s => list.filter(p => cur(p).stav === s).length;
+    const soon = list.filter(p => { const d = daysTo(p.termin); return d !== null && d >= 0 && d <= 90; }).length;
+    $('#stats').innerHTML = `
+      <div class="card stat"><div class="l">Programů celkem</div><div class="n">${list.length}</div><div class="s">${list.filter(p => p.relevance === 'vysoka').length} se hodí nejvíc</div></div>
+      <div class="card stat"><div class="l">Sledujeme</div><div class="n">${n('sledujeme')}</div></div>
+      <div class="card stat"><div class="l">Připravujeme</div><div class="n">${n('priprava')}</div></div>
+      <div class="card stat"><div class="l">Podáno / schváleno</div><div class="n">${n('podano')} / ${n('schvaleno')}</div></div>
+      <div class="card stat"><div class="l">Uzávěrka do 90 dní</div><div class="n">${soon}</div></div>`;
+    const vis = list.filter(matches).sort((a, b) => {
+      const r = { vysoka: 0, stredni: 1, nizka: 2 };
+      return (r[a.relevance] - r[b.relevance]) || String(a.termin || '9999').localeCompare(String(b.termin || '9999'));
+    });
+    $('#list').innerHTML = vis.length ? vis.map(p => {
+      const c = cur(p), [rl, rc] = REL[p.relevance] || REL.stredni;
+      return `<article class="prog" data-id="${esc(p.id)}">
+        <div>
+          <h3>${esc(p.nazev)}</h3>
+          <div class="who">${esc(p.poskytovatel || '')}</div>
+          <div class="tags"><span class="pill">${TYP[p.typ] || ''}</span><span class="pill ${rc}">${rl}</span>${p.vlastni ? '<span class="pill warn">přidáno ručně</span>' : ''}</div>
+          ${p.popis ? `<p class="desc">${esc(p.popis)}</p>` : ''}
+          <dl>
+            <dt>Pro koho</dt><dd>${esc(p.pro || '—')}</dd>
+            <dt>Výše podpory</dt><dd>${esc(p.vyse || '—')}</dd>
+            <dt>Uzávěrka</dt><dd>${deadlineHtml(p)}</dd>
+            <dt>Odkaz</dt><dd>${p.odkaz ? `<a href="${esc(p.odkaz)}" target="_blank" rel="noopener">${esc(p.odkaz.replace(/^https?:\/\//, '').slice(0, 60))}</a>` : '—'}</dd>
+          </dl>
+          ${p.zdroj ? `<div class="src">Zdroj: ${esc(p.zdroj)}</div>` : ''}
+        </div>
+        <div class="side">
+          <label class="f" for="st-${esc(p.id)}">Stav</label>
+          <select id="st-${esc(p.id)}" data-act="stav">${STAV.map(([v, l]) => `<option value="${v}" ${v === c.stav ? 'selected' : ''}>${l}</option>`).join('')}</select>
+          <label class="f" for="pz-${esc(p.id)}">Poznámka</label>
+          <textarea id="pz-${esc(p.id)}" data-act="pozn" placeholder="Co je potřeba, kdo to dělá…">${esc(c.poznamka)}</textarea>
+          ${c.upraveno ? `<span class="saved">Upraveno ${new Date(c.upraveno).toLocaleDateString('cs-CZ')}</span>` : ''}
+          ${p.vlastni ? '<button class="btn btn-sm btn-danger" data-act="del">Smazat program</button>' : ''}
+        </div>
+      </article>`;
+    }).join('') : '<div class="empty">Nic neodpovídá filtru.</div>';
+  }
+
+  document.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (chip) { document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === chip)); filter = chip.dataset.f; render(); }
+    const del = e.target.closest('[data-act=del]');
+    if (del && confirm('Smazat ručně přidaný program?')) { const id = del.closest('.prog').dataset.id; extra = extra.filter(x => x.id !== id); backend.removeExtra(id); render(); }
+  });
+  document.addEventListener('change', e => {
+    const el = e.target.closest('[data-act]'); if (!el) return;
+    const id = el.closest('.prog').dataset.id;
+    const patch = el.dataset.act === 'stav' ? { stav: el.value } : { poznamka: el.value };
+    state[id] = { ...cur({ id }), ...patch, upraveno: Date.now() };
+    backend.save(id, state[id]); render();
+  });
+  $('#q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); render(); });
+  $('#addBtn').addEventListener('click', () => { $('#addForm').reset(); $('#dlg').showModal(); });
+  $('#dlg').addEventListener('close', () => {
+    if ($('#dlg').returnValue !== 'ok') return;
+    const nazev = $('#a_nazev').value.trim(); if (!nazev) return;
+    const item = { id: 'x-' + Date.now().toString(36), nazev, poskytovatel: $('#a_posk').value.trim(), typ: $('#a_typ').value, relevance: $('#a_rel').value, termin: $('#a_term').value, uzaverka: '', odkaz: $('#a_odkaz').value.trim(), popis: $('#a_popis').value.trim(), pro: '', vyse: '' };
+    extra.push(item); backend.addExtra(item); render();
+  });
+
+  // Úložiště: sdílené přes Firebase (stejné jako checklist), záloha v prohlížeči
+  async function init() {
+    try {
+      const v = '10.12.2';
+      const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`);
+      const { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } = await import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`);
+      const db = getFirestore(initializeApp(FIREBASE_CONFIG, 'dotace'));
+      const err = e => { console.error(e); $('#sync').innerHTML = '<b>Uložení se nepovedlo.</b> ' + esc(e.message); };
+      onSnapshot(collection(db, 'reentry_dotace'), s => { const st = {}; s.forEach(d => st[d.id] = d.data()); state = st; $('#sync').innerHTML = '<b>Sdílené s týmem.</b> Stav a poznámky ukládáme hned, ostatní je vidí.'; render(); }, err);
+      onSnapshot(collection(db, 'reentry_dotace_extra'), s => { extra = s.docs.map(d => d.data()); render(); }, err);
+      return {
+        save: (id, d) => setDoc(doc(db, 'reentry_dotace', id), d).catch(err),
+        addExtra: it => setDoc(doc(db, 'reentry_dotace_extra', it.id), it).catch(err),
+        removeExtra: id => Promise.all([deleteDoc(doc(db, 'reentry_dotace_extra', id)), deleteDoc(doc(db, 'reentry_dotace', id))]).catch(err),
+      };
+    } catch (e) {
+      console.error(e);
+      const K = 'reentry_dotace_local';
+      try { const r = JSON.parse(localStorage.getItem(K) || '{}'); state = r.state || {}; extra = r.extra || []; } catch (er) {}
+      const persist = () => { try { localStorage.setItem(K, JSON.stringify({ state, extra })); } catch (er) {} };
+      $('#sync').innerHTML = '<b>Sdílení není dostupné</b>, ukládá se jen v tomto prohlížeči.';
+      return { save: persist, addExtra: persist, removeExtra: persist };
+    }
+  }
+  render();
+  backend = await init();
+</script>
+</body>
+</html>
